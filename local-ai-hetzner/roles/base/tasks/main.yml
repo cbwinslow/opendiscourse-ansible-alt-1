@@ -1,0 +1,25 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install required packages
+  apt:
+    name:
+      - docker.io
+      - docker-compose
+      - python3-pip
+      - ufw
+      - fail2ban
+    state: present
+
+- name: Configure timezone
+  timezone:
+    name: "{{ timezone }}"
+
+- name: Start and enable Docker service
+  service:
+    name: docker
+    state: started
+    enabled: yes

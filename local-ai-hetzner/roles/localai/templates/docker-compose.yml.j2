@@ -1,0 +1,128 @@
+---
+version: '3.8'
+
+volumes:
+  n8n_storage:
+  ollama_storage:
+  qdrant_storage:
+  open-webui:
+  flowise:
+  langfuse_postgres_data:
+  langfuse_clickhouse_data:
+  langfuse_clickhouse_logs:
+  langfuse_minio_data:
+  neo4j_data:
+  neo4j_logs:
+  neo4j_import:
+  neo4j_plugins:
+
+services:
+  flowise:
+    image: flowiseai/flowise
+    restart: unless-stopped
+    container_name: flowise
+    expose:
+      - 3001/tcp
+    environment:
+      - PORT=3001
+      - FLOWISE_USERNAME={{ flowise_username }}
+      - FLOWISE_PASSWORD={{ flowise_password }}
+    volumes:
+      - flowise:/root/.flowise
+    networks:
+      - traefik-net
+
+  neo4j:
+    image: neo4j:{{ neo4j_version }}
+    container_name: neo4j
+    restart: unless-stopped
+    environment:
+      - NEO4J_AUTH={{ neo4j_auth }}
+      - NEO4J_dbms_memory_pagecache_size=1G
+      - NEO4J_dbms.memory.heap.initial_size=1G
+      - NEO4J_dbms_memory_heap_max__size=1G
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+      - neo4j_import:/import
+      - neo4j_plugins:/plugins
+    expose:
+      - 7474/tcp
+      - 7687/tcp
+    networks:
+      - traefik-net
+
+  langfuse-worker:
+    image: langfuse/langfuse-worker:{{ langfuse_version }}
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://postgres:{{ postgres_password }}@postgres:5432/postgres
+      SALT: {{ langfuse_salt }}
+      ENCRYPTION_KEY: {{ encryption_key }}
+      TELEMETRY_ENABLED: "true"
+      CLICKHOUSE_URL: http://clickhouse:8123
+      CLICKHOUSE_USER: clickhouse
+      CLICKHOUSE_PASSWORD: {{ clickhouse_password }}
+    networks:
+      - traefik-net
+
+  langfuse-web:
+    image: langfuse/langfuse:{{ langfuse_version }}
+    restart: always
+    environment:
+      NEXTAUTH_URL: https://{{ langfuse_domain }}
+      NEXTAUTH_SECRET: {{ nextauth_secret }}
+      DATABASE_URL: postgresql://postgres:{{ postgres_password }}@postgres:5432/postgres
+    networks:
+      - traefik-net
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:{{ clickhouse_version }}
+    restart: always
+    environment:
+      CLICKHOUSE_DB: default
+      CLICKHOUSE_USER: clickhouse
+      CLICKHOUSE_PASSWORD: {{ clickhouse_password }}
+    volumes:
+      - langfuse_clickhouse_data:/var/lib/clickhouse
+      - langfuse_clickhouse_logs:/var/log/clickhouse-server
+    networks:
+      - traefik-net
+
+  postgres:
+    image: postgres:{{ postgres_version }}
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: {{ postgres_password }}
+      POSTGRES_DB: postgres
+    volumes:
+      - langfuse_postgres_data:/var/lib/postgresql/data
+    networks:
+      - traefik-net
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    environment:
+      - OLLAMA_MODELS={{ ollama_models | join(',') }}
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_ORIGINS={{ ollama_origins | join(',') }}
+    volumes:
+      - ollama_storage:/root/.ollama
+    networks:
+      - traefik-net
+    {% if gpu_enabled %}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    {% endif %}
+
+networks:
+  traefik-net:
+    external: true

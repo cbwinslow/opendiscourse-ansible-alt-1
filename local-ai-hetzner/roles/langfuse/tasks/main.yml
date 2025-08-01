@@ -1,0 +1,29 @@
+---
+- name: Create Langfuse directory
+  file:
+    path: /opt/langfuse
+    state: directory
+    mode: '0755'
+
+- name: Copy Langfuse docker-compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/langfuse/docker-compose.yml
+
+- name: Copy Langfuse environment file
+  template:
+    src: .env.j2
+    dest: /opt/langfuse/.env
+    mode: '0600'
+
+- name: Create Langfuse database
+  postgresql_db:
+    name: langfuse
+    state: present
+
+- name: Deploy Langfuse stack
+  docker_compose:
+    project_src: /opt/langfuse
+    state: present
+    networks:
+      - name: traefik-net

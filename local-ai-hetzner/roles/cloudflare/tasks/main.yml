@@ -1,0 +1,45 @@
+---
+- name: Configure DNS records for opendiscourse.net
+  cloudflare_dns:
+    zone: opendiscourse.net
+    record: "{{ item.record }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+    account_email: "{{ cloudflare_email }}"
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+  loop:
+    - { record: '@', type: 'A', value: '{{ ansible_host }}' }
+    - { record: 'www', type: 'CNAME', value: 'opendiscourse.net' }
+    - { record: 'api', type: 'A', value: '{{ ansible_host }}' }
+    - { record: 'langfuse', type: 'A', value: '{{ ansible_host }}' }
+    - { record: 'monitoring', type: 'A', value: '{{ ansible_host }}' }
+
+- name: Configure Cloudflare SSL/TLS settings
+  cloudflare_zone:
+    zone: opendiscourse.net
+    account_email: "{{ cloudflare_email }}"
+    account_api_token: "{{ cloudflare_api_token }}"
+    ssl: full
+    state: present
+
+- name: Enable Cloudflare security features
+  cloudflare_zone_settings:
+    zone: opendiscourse.net
+    account_email: "{{ cloudflare_email }}"
+    account_api_token: "{{ cloudflare_api_token }}"
+    settings:
+      security_level: high
+      ssl: full
+      always_use_https: true
+      min_tls_version: "1.2"
+      opportunistic_encryption: on
+      automatic_https_rewrites: on
+      browser_check: on
+      challenge_ttl: 2700
+      privacy_pass: on
+      security_header:
+        enabled: true
+        include_subdomains: true
+        max_age: 31536000
+        nosniff: true

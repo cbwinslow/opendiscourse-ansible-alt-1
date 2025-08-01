@@ -1,0 +1,29 @@
+---
+- name: Create RabbitMQ directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  with_items:
+    - /opt/rabbitmq/data
+    - /opt/rabbitmq/logs
+    - /opt/rabbitmq/config
+
+- name: Template RabbitMQ configuration
+  template:
+    src: rabbitmq.conf.j2
+    dest: /opt/rabbitmq/config/rabbitmq.conf
+    mode: '0644'
+
+- name: Copy RabbitMQ docker-compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/rabbitmq/docker-compose.yml
+    mode: '0644'
+
+- name: Deploy RabbitMQ
+  docker_compose:
+    project_src: /opt/rabbitmq
+    state: present
+    networks:
+      - name: traefik-net

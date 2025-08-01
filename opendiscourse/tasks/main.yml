@@ -1,0 +1,31 @@
+---
+# Tasks for OpenDiscourse deployment
+
+- name: Create OpenDiscourse directory
+  file:
+    path: "{{ opendiscourse_install_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Copy docker-compose.yml
+  copy:
+    src: docker-compose.yml
+    dest: "{{ opendiscourse_install_dir }}/docker-compose.yml"
+    mode: '0644'
+
+- name: Template environment file
+  template:
+    src: env.j2
+    dest: "{{ opendiscourse_install_dir }}/.env"
+    mode: '0600'
+
+- name: Pull Docker images
+  community.docker.docker_compose:
+    project_src: "{{ opendiscourse_install_dir }}"
+    pull: yes
+    state: present
+
+- name: Start OpenDiscourse services
+  community.docker.docker_compose:
+    project_src: "{{ opendiscourse_install_dir }}"
+    state: present

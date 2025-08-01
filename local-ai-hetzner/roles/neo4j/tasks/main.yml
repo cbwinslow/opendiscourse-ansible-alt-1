@@ -1,0 +1,16 @@
+---
+- name: Create Neo4j directory
+  file:
+    path: /opt/neo4j
+    state: directory
+    mode: '0755'
+
+- name: Copy Neo4j docker-compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/neo4j/docker-compose.yml
+
+- name: Deploy Neo4j stack
+  docker_compose:
+    project_src: /opt/neo4j
+    state: present

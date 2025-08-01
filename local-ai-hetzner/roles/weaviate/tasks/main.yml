@@ -1,0 +1,39 @@
+---
+- name: Create Weaviate directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  with_items:
+    - /opt/weaviate/data
+    - /opt/weaviate/config
+    - /opt/weaviate/backup
+
+- name: Template Weaviate configuration
+  template:
+    src: config.yaml.j2
+    dest: /opt/weaviate/config/config.yaml
+    mode: '0644'
+
+- name: Copy Weaviate docker-compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/weaviate/docker-compose.yml
+    mode: '0644'
+
+- name: Deploy Weaviate
+  docker_compose:
+    project_src: /opt/weaviate
+    state: present
+    networks:
+      - name: traefik-net
+
+- name: Wait for Weaviate to be ready
+  uri:
+    url: "http://localhost:{{ weaviate_port }}/v1/.well-known/ready"
+    method: GET
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 60
+  delay: 5

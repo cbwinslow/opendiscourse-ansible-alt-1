@@ -1,0 +1,37 @@
+---
+- name: Create Traefik directory
+  file:
+    path: /opt/traefik
+    state: directory
+    mode: '0755'
+
+- name: Create Traefik dynamic config directory
+  file:
+    path: /opt/traefik/dynamic
+    state: directory
+    mode: '0755'
+
+- name: Copy Traefik configuration
+  template:
+    src: traefik.yml.j2
+    dest: /opt/traefik/traefik.yml
+
+- name: Copy Traefik dynamic configuration
+  template:
+    src: dynamic-conf.yml.j2
+    dest: /opt/traefik/dynamic/conf.yml
+
+- name: Copy Traefik docker-compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/traefik/docker-compose.yml
+
+- name: Create Traefik network
+  docker_network:
+    name: traefik-net
+    state: present
+
+- name: Deploy Traefik
+  docker_compose:
+    project_src: /opt/traefik
+    state: present

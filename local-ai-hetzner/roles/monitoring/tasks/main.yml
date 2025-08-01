@@ -1,0 +1,16 @@
+---
+- name: Create monitoring directory
+  file:
+    path: /opt/monitoring
+    state: directory
+    mode: '0755'
+
+- name: Copy monitoring stack docker-compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/monitoring/docker-compose.yml
+
+- name: Deploy monitoring stack
+  docker_compose:
+    project_src: /opt/monitoring
+    state: present

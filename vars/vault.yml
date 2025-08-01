@@ -1,0 +1,36 @@
+---
+# Database Credentials
+db_credentials:
+  host: "localhost"
+  port: 5432
+  database: "app_db"
+  username: "app_user"
+  password: "{{ vault_db_password }}"
+
+# SMTP Configuration
+smtp:
+  host: "smtp.example.com"
+  port: 587
+  username: "mailer@example.com"
+  password: "{{ vault_smtp_password }}"
+  use_tls: true
+
+# API Tokens
+api_tokens:
+  github: "{{ vault_github_token }}"
+  aws: "{{ vault_aws_token }}"
+  monitoring: "{{ vault_monitoring_token }}"
+
+# Admin Passwords
+admin_credentials:
+  username: "admin"
+  password: "{{ vault_admin_password }}"
+
+# Monitoring System Credentials
+monitoring:
+  prometheus_basic_auth:
+    username: "prometheus"
+    password: "{{ vault_prometheus_password }}"
+  grafana:
+    admin_user: "admin"
+    admin_password: "{{ vault_grafana_password }}"

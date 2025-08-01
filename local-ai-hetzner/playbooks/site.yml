@@ -1,0 +1,33 @@
+---
+- name: System hardening and security
+  hosts: local_ai
+  roles:
+    - base
+    - security
+    - hardening
+
+- name: Configure DNS and Cloudflare
+  hosts: local_ai
+  roles:
+    - cloudflare
+    - dns
+
+- name: Configure reverse proxy and SSL
+  hosts: local_ai
+  roles:
+    - traefik
+    # Uncomment the preferred reverse proxy:
+    # - nginx
+    # - caddy
+
+- name: Deploy LocalAI and RAG components
+  hosts: local_ai
+  roles:
+    - localai
+    - neo4j
+    - langfuse
+
+- name: Deploy monitoring stack
+  hosts: local_ai
+  roles:
+    - monitoring

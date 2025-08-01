@@ -1,0 +1,29 @@
+---
+# Default variables for OpenDiscourse
+
+# Installation directory
+opendiscourse_install_dir: /opt/opendiscourse
+
+# Database configuration
+opendiscourse_db_name: opendiscourse
+opendiscourse_db_user: opendiscourse
+opendiscourse_db_password: "{{ vault_opendiscourse_db_password | default('Temp1234!') }}"
+
+# Application configuration
+opendiscourse_app_port: 3000
+opendiscourse_node_env: production
+opendiscourse_api_secret: "{{ vault_opendiscourse_api_secret | default('Temp1234!') }}"
+
+# Redis configuration
+opendiscourse_redis_host: redis
+opendiscourse_redis_port: 6379
+
+# Email configuration
+opendiscourse_smtp_host: ""
+opendiscourse_smtp_port: 587
+opendiscourse_smtp_user: ""
+opendiscourse_smtp_password: ""
+
+# Feature flags
+opendiscourse_enable_sso: false
+opendiscourse_debug_mode: false

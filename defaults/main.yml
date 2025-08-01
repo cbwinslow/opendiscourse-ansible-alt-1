@@ -1,0 +1,30 @@
+---
+# Service Ports
+service_ports:
+  http: 80
+  https: 443
+  app: 8080
+  metrics: 9090
+
+# Network Configuration
+network:
+  subnet: "10.0.0.0/24"
+  gateway: "10.0.0.1"
+  dns_servers:
+    - "8.8.8.8"
+    - "8.8.4.4"
+
+# Resource Limits
+resource_limits:
+  cpu: "2"
+  memory: "4Gi"
+  storage: "20Gi"
+  max_connections: 1000
+
+# Default Settings
+default_settings:
+  log_level: "INFO"
+  timeout: 30
+  max_retries: 3
+  backoff_factor: 1.5
+  environment: "development"

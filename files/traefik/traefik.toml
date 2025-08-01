@@ -1,0 +1,26 @@
+[global]
+  checkNewVersion = true
+  sendAnonymousUsage = false
+
+[log]
+  level = "INFO"
+
+[entryPoints]
+  [entryPoints.web]
+    address = ":80"
+  [entryPoints.metrics]
+    address = ":8080"
+
+[api]
+  dashboard = true
+  insecure = true
+
+[providers]
+  [providers.docker]
+    endpoint = "unix:///var/run/docker.sock"
+    watch = true
+    exposedByDefault = false
+
+[metrics]
+  [metrics.prometheus]
+    entryPoint = "metrics"

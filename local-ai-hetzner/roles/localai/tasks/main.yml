@@ -1,0 +1,16 @@
+---
+- name: Create LocalAI directory
+  file:
+    path: /opt/localai
+    state: directory
+    mode: '0755'
+
+- name: Copy LocalAI docker-compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/localai/docker-compose.yml
+
+- name: Deploy LocalAI stack
+  docker_compose:
+    project_src: /opt/localai
+    state: present

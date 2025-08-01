@@ -1,0 +1,55 @@
+---
+# System settings
+ansible_python_interpreter: /usr/bin/python3
+timezone: UTC
+
+# Domain settings
+domain: opendiscourse.net
+
+# Docker settings
+docker_compose_version: "1.29.2"
+
+# LocalAI settings
+localai_version: "latest"
+localai_port: 8080
+
+# Neo4j settings
+neo4j_version: "4.4"
+neo4j_port: 7474
+neo4j_bolt_port: 7687
+
+# Langfuse settings
+langfuse_version: "latest"
+langfuse_port: 3000
+
+# Traefik settings
+traefik_version: "v2.10"
+traefik_dashboard_port: 8080
+
+# Monitoring settings
+prometheus_port: 9090
+grafana_port: 3000
+loki_port: 3100
+prometheus_retention: "30d"
+grafana_admin_password: "{{ vault_grafana_admin_password }}"
+
+# Security settings
+ufw_allowed_ports:
+  - 22    # SSH
+  - 80    # HTTP
+  - 443   # HTTPS
+  - 8080  # Traefik Dashboard
+
+# Cloudflare settings
+cloudflare_email: "{{ vault_cloudflare_email }}"
+cloudflare_api_token: "{{ vault_cloudflare_api_token }}"
+cloudflare_zone_id: "{{ vault_cloudflare_zone_id }}"
+
+# SSL settings
+ssl_email: "admin@opendiscourse.net"
+ssl_staging: false  # Set to true for testing
+
+# Monitoring thresholds
+disk_usage_threshold: 80
+cpu_usage_threshold: 90
+memory_usage_threshold: 85

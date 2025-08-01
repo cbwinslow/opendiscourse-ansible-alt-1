@@ -1,0 +1,26 @@
+---
+- name: Create OAuth configuration directory
+  file:
+    path: /opt/oauth
+    state: directory
+    mode: '0755'
+
+- name: Template OAuth configuration
+  template:
+    src: oauth-config.yaml.j2
+    dest: /opt/oauth/config.yaml
+    mode: '0644'
+
+- name: Deploy OAuth Proxy
+  docker_compose:
+    project_src: /opt/oauth
+    state: present
+    networks:
+      - name: traefik-net
+
+- name: Configure OAuth endpoints in Traefik
+  template:
+    src: oauth-middleware.yaml.j2
+    dest: /opt/traefik/dynamic/oauth.yaml
+    mode: '0644'
+  notify: reload traefik

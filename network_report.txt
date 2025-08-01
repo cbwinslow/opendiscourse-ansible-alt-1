@@ -1,0 +1,881 @@
+==== NETWORK DIAGNOSTICS REPORT ====
+Hostname: cbwamd
+Date: Fri Aug  1 05:26:58 AM EDT 2025
+
+--- Network Interfaces ---
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host noprefixroute 
+       valid_lft forever preferred_lft forever
+2: enp9s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether f0:2f:74:21:e4:d8 brd ff:ff:ff:ff:ff:ff
+    altname enxf02f7421e4d8
+    inet 192.168.100.68/24 brd 192.168.100.255 scope global dynamic noprefixroute enp9s0
+       valid_lft 174199sec preferred_lft 174199sec
+    inet6 fe80::f22f:74ff:fe21:e4d8/64 scope link proto kernel_ll 
+       valid_lft forever preferred_lft forever
+3: wlp6s0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default qlen 1000
+    link/ether 4c:eb:42:e2:5b:5d brd ff:ff:ff:ff:ff:ff
+    altname wlx4ceb42e25b5d
+4: virbr0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default qlen 1000
+    link/ether 52:54:00:99:60:aa brd ff:ff:ff:ff:ff:ff
+    inet 192.168.122.1/24 brd 192.168.122.255 scope global virbr0
+       valid_lft forever preferred_lft forever
+5: ztt6jxripk: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 2800 qdisc fq_codel state UNKNOWN group default qlen 1000
+    link/ether 4e:ba:db:b7:38:45 brd ff:ff:ff:ff:ff:ff
+    inet 172.28.172.82/16 brd 172.28.255.255 scope global ztt6jxripk
+       valid_lft forever preferred_lft forever
+    inet6 fe80::4cba:dbff:feb7:3845/64 scope link proto kernel_ll 
+       valid_lft forever preferred_lft forever
+6: tailscale0: <POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP> mtu 1280 qdisc fq_codel state UNKNOWN group default qlen 500
+    link/none 
+    inet6 fe80::11e6:9f7a:76e2:2541/64 scope link stable-privacy proto kernel_ll 
+       valid_lft forever preferred_lft forever
+7: mpqemubr0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default qlen 1000
+    link/ether 52:54:00:3b:61:80 brd ff:ff:ff:ff:ff:ff
+    inet 10.170.163.1/24 brd 10.170.163.255 scope global mpqemubr0
+       valid_lft forever preferred_lft forever
+8: br-f58d4c19a6c2: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
+    link/ether 06:86:5b:33:81:ae brd ff:ff:ff:ff:ff:ff
+    inet 172.22.0.1/16 brd 172.22.255.255 scope global br-f58d4c19a6c2
+       valid_lft forever preferred_lft forever
+9: br-38fd1a56fad6: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
+    link/ether 1a:4f:b6:e7:b2:c0 brd ff:ff:ff:ff:ff:ff
+    inet 172.23.0.1/16 brd 172.23.255.255 scope global br-38fd1a56fad6
+       valid_lft forever preferred_lft forever
+10: docker0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    link/ether ba:1b:5c:62:5a:f8 brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::b81b:5cff:fe62:5af8/64 scope link proto kernel_ll 
+       valid_lft forever preferred_lft forever
+11: br-5a3504693be8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    link/ether 92:1b:e2:cc:ab:5b brd ff:ff:ff:ff:ff:ff
+    inet 172.18.0.1/16 brd 172.18.255.255 scope global br-5a3504693be8
+       valid_lft forever preferred_lft forever
+    inet6 fe80::901b:e2ff:fecc:ab5b/64 scope link proto kernel_ll 
+       valid_lft forever preferred_lft forever
+12: br-7a4b2148d0b8: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
+    link/ether d6:ec:a6:7a:c4:08 brd ff:ff:ff:ff:ff:ff
+    inet 172.21.0.1/16 brd 172.21.255.255 scope global br-7a4b2148d0b8
+       valid_lft forever preferred_lft forever
+14: br-d1bf47229317: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
+    link/ether aa:2b:2a:7c:20:c4 brd ff:ff:ff:ff:ff:ff
+    inet 172.20.0.1/16 brd 172.20.255.255 scope global br-d1bf47229317
+       valid_lft forever preferred_lft forever
+15: veth952ea8f@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-5a3504693be8 state UP group default 
+    link/ether 6a:08:bf:c6:f3:9d brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet6 fe80::6808:bfff:fec6:f39d/64 scope link proto kernel_ll 
+       valid_lft forever preferred_lft forever
+17: vetha4f3d0a@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-5a3504693be8 state UP group default 
+    link/ether 3a:0b:2f:b4:3e:d1 brd ff:ff:ff:ff:ff:ff link-netnsid 2
+    inet6 fe80::380b:2fff:feb4:3ed1/64 scope link proto kernel_ll 
+       valid_lft forever preferred_lft forever
+19: veth9bd302b@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-5a3504693be8 state UP group default 
+    link/ether f2:ae:22:7c:df:b7 brd ff:ff:ff:ff:ff:ff link-netnsid 4
+    inet6 fe80::f0ae:22ff:fe7c:dfb7/64 scope link proto kernel_ll 
+       valid_lft forever preferred_lft forever
+28: vxlan.calico: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/ether 66:df:e8:35:78:3f brd ff:ff:ff:ff:ff:ff
+    inet 10.1.60.128/32 scope global vxlan.calico
+       valid_lft forever preferred_lft forever
+    inet6 fe80::64df:e8ff:fe35:783f/64 scope link proto kernel_ll 
+       valid_lft forever preferred_lft forever
+4189: veth939c308@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master docker0 state UP group default 
+    link/ether be:3e:66:82:db:02 brd ff:ff:ff:ff:ff:ff link-netnsid 11
+    inet6 fe80::bc3e:66ff:fe82:db02/64 scope link proto kernel_ll 
+       valid_lft forever preferred_lft forever
+4846: calie22a2124a42@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue state UP group default qlen 1000
+    link/ether ee:ee:ee:ee:ee:ee brd ff:ff:ff:ff:ff:ff link-netns cni-3c7de10c-7c57-cec2-7439-84b405865433
+    inet6 fe80::ecee:eeff:feee:eeee/64 scope link proto kernel_ll 
+       valid_lft forever preferred_lft forever
+4847: calicc633e3a70e@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue state UP group default qlen 1000
+    link/ether ee:ee:ee:ee:ee:ee brd ff:ff:ff:ff:ff:ff link-netns cni-5bb823a9-8707-a3a0-de41-94c4db77d9e8
+    inet6 fe80::ecee:eeff:feee:eeee/64 scope link proto kernel_ll 
+       valid_lft forever preferred_lft forever
+4866: br-aa09067c82a4: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    link/ether b6:4c:88:92:a8:9e brd ff:ff:ff:ff:ff:ff
+    inet 172.19.0.1/16 brd 172.19.255.255 scope global br-aa09067c82a4
+       valid_lft forever preferred_lft forever
+    inet6 fe80::b44c:88ff:fe92:a89e/64 scope link proto kernel_ll 
+       valid_lft forever preferred_lft forever
+4867: veth8ed7de1@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-aa09067c82a4 state UP group default 
+    link/ether 42:42:62:6f:73:56 brd ff:ff:ff:ff:ff:ff link-netnsid 1
+    inet6 fe80::4042:62ff:fe6f:7356/64 scope link proto kernel_ll 
+       valid_lft forever preferred_lft forever
+4868: vethfdaa9ca@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-aa09067c82a4 state UP group default 
+    link/ether b6:8d:9c:31:db:d5 brd ff:ff:ff:ff:ff:ff link-netnsid 3
+    inet6 fe80::b48d:9cff:fe31:dbd5/64 scope link proto kernel_ll 
+       valid_lft forever preferred_lft forever
+4869: veth7eef0b2@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-aa09067c82a4 state UP group default 
+    link/ether 52:21:b3:30:60:e2 brd ff:ff:ff:ff:ff:ff link-netnsid 5
+    inet6 fe80::5021:b3ff:fe30:60e2/64 scope link proto kernel_ll 
+       valid_lft forever preferred_lft forever
+5307: vethd74c135@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master docker0 state UP group default 
+    link/ether 9e:64:fd:c4:9d:09 brd ff:ff:ff:ff:ff:ff link-netnsid 12
+    inet6 fe80::9c64:fdff:fec4:9d09/64 scope link proto kernel_ll 
+       valid_lft forever preferred_lft forever
+
+--- Routing Table ---
+default via 192.168.100.1 dev enp9s0 proto dhcp src 192.168.100.68 metric 100 
+blackhole 10.1.60.128/26 proto 80 
+10.1.60.164 dev calie22a2124a42 scope link 
+10.1.60.167 dev calicc633e3a70e scope link 
+10.170.163.0/24 dev mpqemubr0 proto kernel scope link src 10.170.163.1 linkdown 
+172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 
+172.18.0.0/16 dev br-5a3504693be8 proto kernel scope link src 172.18.0.1 
+172.19.0.0/16 dev br-aa09067c82a4 proto kernel scope link src 172.19.0.1 
+172.20.0.0/16 dev br-d1bf47229317 proto kernel scope link src 172.20.0.1 linkdown 
+172.21.0.0/16 dev br-7a4b2148d0b8 proto kernel scope link src 172.21.0.1 linkdown 
+172.22.0.0/16 dev br-f58d4c19a6c2 proto kernel scope link src 172.22.0.1 linkdown 
+172.23.0.0/16 dev br-38fd1a56fad6 proto kernel scope link src 172.23.0.1 linkdown 
+172.28.0.0/16 dev ztt6jxripk proto kernel scope link src 172.28.172.82 
+192.168.100.0/24 dev enp9s0 proto kernel scope link src 192.168.100.68 metric 100 
+192.168.122.0/24 dev virbr0 proto kernel scope link src 192.168.122.1 linkdown 
+
+--- DNS Configuration ---
+# This is /run/systemd/resolve/stub-resolv.conf managed by man:systemd-resolved(8).
+# Do not edit.
+#
+# This file might be symlinked as /etc/resolv.conf. If you're looking at
+# /etc/resolv.conf and seeing this text, you have followed the symlink.
+#
+# This is a dynamic resolv.conf file for connecting local clients to the
+# internal DNS stub resolver of systemd-resolved. This file lists all
+# configured search domains.
+#
+# Run "resolvectl status" to see details about the uplink DNS servers
+# currently in use.
+#
+# Third party programs should typically not access this file directly, but only
+# through the symlink at /etc/resolv.conf. To manage man:resolv.conf(5) in a
+# different way, replace this symlink by a static file or a different symlink.
+#
+# See man:systemd-resolved.service(8) for details about the supported modes of
+# operation for /etc/resolv.conf.
+
+nameserver 127.0.0.53
+options edns0 trust-ad
+search lan
+
+--- UFW Status ---
+Status: active
+Logging: on (low)
+Default: deny (incoming), allow (outgoing), deny (routed)
+New profiles: skip
+
+To                         Action      From
+--                         ------      ----
+80/tcp                     ALLOW IN    Anywhere                  
+443/tcp                    ALLOW IN    Anywhere                  
+Anywhere on vxlan.calico   ALLOW IN    Anywhere                  
+Anywhere on cali+          ALLOW IN    Anywhere                  
+16160/tcp                  ALLOW IN    Anywhere                  
+80/tcp (v6)                ALLOW IN    Anywhere (v6)             
+443/tcp (v6)               ALLOW IN    Anywhere (v6)             
+Anywhere (v6) on vxlan.calico ALLOW IN    Anywhere (v6)             
+Anywhere (v6) on cali+     ALLOW IN    Anywhere (v6)             
+16160/tcp (v6)             ALLOW IN    Anywhere (v6)             
+
+Anywhere                   ALLOW OUT   Anywhere on vxlan.calico  
+Anywhere                   ALLOW OUT   Anywhere on cali+         
+Anywhere (v6)              ALLOW OUT   Anywhere (v6) on vxlan.calico
+Anywhere (v6)              ALLOW OUT   Anywhere (v6) on cali+    
+
+
+--- iptables Rules ---
+Chain INPUT (policy DROP 25207 packets, 1450K bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 ACCEPT     tcp  --  mpqemubr0 *       0.0.0.0/0            0.0.0.0/0            tcp dpt:53 /* generated for Multipass network mpqemubr0 */
+    0     0 ACCEPT     udp  --  mpqemubr0 *       0.0.0.0/0            0.0.0.0/0            udp dpt:53 /* generated for Multipass network mpqemubr0 */
+    0     0 ACCEPT     udp  --  mpqemubr0 *       0.0.0.0/0            0.0.0.0/0            udp dpt:67 /* generated for Multipass network mpqemubr0 */
+  22M   10G LIBVIRT_INP  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+  22M   10G ufw-before-logging-input  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+  22M   10G ufw-before-input  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+36671 2079K ufw-after-input  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+25207 1450K ufw-after-logging-input  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+25207 1450K ufw-reject-input  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+25207 1450K ufw-track-input  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+
+Chain FORWARD (policy DROP 0 packets, 0 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+7348K 6018M DOCKER-USER  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+7348K 6018M DOCKER-FORWARD  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+    0     0 ACCEPT     all  --  mpqemubr0 mpqemubr0  0.0.0.0/0            0.0.0.0/0            /* generated for Multipass network mpqemubr0 */
+    0     0 ACCEPT     all  --  mpqemubr0 *       10.170.163.0/24      0.0.0.0/0            /* generated for Multipass network mpqemubr0 */
+    0     0 ACCEPT     all  --  *      mpqemubr0  0.0.0.0/0            10.170.163.0/24      ctstate RELATED,ESTABLISHED /* generated for Multipass network mpqemubr0 */
+   27  3089 LIBVIRT_FWX  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+   27  3089 LIBVIRT_FWI  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+   27  3089 LIBVIRT_FWO  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+   27  3089 ufw-before-logging-forward  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+   27  3089 ufw-before-forward  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+   17  1203 ufw-after-forward  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+   17  1203 ufw-after-logging-forward  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+   17  1203 ufw-reject-forward  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+   17  1203 ufw-track-forward  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+   17  1203 ACCEPT     all  --  *      *       10.1.0.0/16          0.0.0.0/0            /* generated for MicroK8s pods */
+    0     0 ACCEPT     all  --  *      *       0.0.0.0/0            10.1.0.0/16          /* generated for MicroK8s pods */
+    0     0 REJECT     all  --  mpqemubr0 *       0.0.0.0/0            0.0.0.0/0            /* generated for Multipass network mpqemubr0 */ reject-with icmp-port-unreachable
+    0     0 REJECT     all  --  *      mpqemubr0  0.0.0.0/0            0.0.0.0/0            /* generated for Multipass network mpqemubr0 */ reject-with icmp-port-unreachable
+
+Chain OUTPUT (policy ACCEPT 99 packets, 4708 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 ACCEPT     tcp  --  *      mpqemubr0  0.0.0.0/0            0.0.0.0/0            tcp spt:53 /* generated for Multipass network mpqemubr0 */
+    0     0 ACCEPT     udp  --  *      mpqemubr0  0.0.0.0/0            0.0.0.0/0            udp spt:53 /* generated for Multipass network mpqemubr0 */
+    0     0 ACCEPT     udp  --  *      mpqemubr0  0.0.0.0/0            0.0.0.0/0            udp spt:67 /* generated for Multipass network mpqemubr0 */
+  22M 7506M LIBVIRT_OUT  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+  22M 7506M ufw-before-logging-output  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+  22M 7506M ufw-before-output  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+ 463K   65M ufw-after-output  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+ 463K   65M ufw-after-logging-output  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+ 463K   65M ufw-reject-output  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+ 463K   65M ufw-track-output  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+
+Chain DOCKER (7 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 ACCEPT     tcp  --  !br-5a3504693be8 br-5a3504693be8  0.0.0.0/0            172.18.0.4           tcp dpt:27017
+    0     0 ACCEPT     tcp  --  !br-5a3504693be8 br-5a3504693be8  0.0.0.0/0            172.18.0.3           tcp dpt:6379
+    0     0 DROP       all  --  !br-f58d4c19a6c2 br-f58d4c19a6c2  0.0.0.0/0            0.0.0.0/0           
+    0     0 DROP       all  --  !br-38fd1a56fad6 br-38fd1a56fad6  0.0.0.0/0            0.0.0.0/0           
+    0     0 DROP       all  --  !br-5a3504693be8 br-5a3504693be8  0.0.0.0/0            0.0.0.0/0           
+    0     0 DROP       all  --  !br-7a4b2148d0b8 br-7a4b2148d0b8  0.0.0.0/0            0.0.0.0/0           
+    0     0 DROP       all  --  !br-d1bf47229317 br-d1bf47229317  0.0.0.0/0            0.0.0.0/0           
+    0     0 DROP       all  --  !docker0 docker0  0.0.0.0/0            0.0.0.0/0           
+    0     0 DROP       all  --  !br-aa09067c82a4 br-aa09067c82a4  0.0.0.0/0            0.0.0.0/0           
+
+Chain DOCKER-BRIDGE (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 DOCKER     all  --  *      br-f58d4c19a6c2  0.0.0.0/0            0.0.0.0/0           
+    0     0 DOCKER     all  --  *      br-38fd1a56fad6  0.0.0.0/0            0.0.0.0/0           
+    6   360 DOCKER     all  --  *      br-5a3504693be8  0.0.0.0/0            0.0.0.0/0           
+    0     0 DOCKER     all  --  *      br-7a4b2148d0b8  0.0.0.0/0            0.0.0.0/0           
+    0     0 DOCKER     all  --  *      br-d1bf47229317  0.0.0.0/0            0.0.0.0/0           
+    0     0 DOCKER     all  --  *      docker0  0.0.0.0/0            0.0.0.0/0           
+ 2774  166K DOCKER     all  --  *      br-aa09067c82a4  0.0.0.0/0            0.0.0.0/0           
+
+Chain DOCKER-CT (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 ACCEPT     all  --  *      br-f58d4c19a6c2  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED
+    0     0 ACCEPT     all  --  *      br-38fd1a56fad6  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED
+ 146K   33M ACCEPT     all  --  *      br-5a3504693be8  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED
+    0     0 ACCEPT     all  --  *      br-7a4b2148d0b8  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED
+    0     0 ACCEPT     all  --  *      br-d1bf47229317  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED
+ 8942   60M ACCEPT     all  --  *      docker0  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED
+ 195K   79M ACCEPT     all  --  *      br-aa09067c82a4  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED
+
+Chain DOCKER-FORWARD (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+7348K 6018M DOCKER-CT  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+2877K  264M DOCKER-ISOLATION-STAGE-1  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+2877K  264M DOCKER-BRIDGE  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+    0     0 ACCEPT     all  --  br-f58d4c19a6c2 *       0.0.0.0/0            0.0.0.0/0           
+    0     0 ACCEPT     all  --  br-38fd1a56fad6 *       0.0.0.0/0            0.0.0.0/0           
+    6   360 ACCEPT     all  --  br-5a3504693be8 *       0.0.0.0/0            0.0.0.0/0           
+    0     0 ACCEPT     all  --  br-7a4b2148d0b8 *       0.0.0.0/0            0.0.0.0/0           
+    0     0 ACCEPT     all  --  br-d1bf47229317 *       0.0.0.0/0            0.0.0.0/0           
+ 4798  623K ACCEPT     all  --  docker0 *       0.0.0.0/0            0.0.0.0/0           
+ 173K   17M ACCEPT     all  --  br-aa09067c82a4 *       0.0.0.0/0            0.0.0.0/0           
+
+Chain DOCKER-ISOLATION-STAGE-1 (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 DOCKER-ISOLATION-STAGE-2  all  --  br-f58d4c19a6c2 !br-f58d4c19a6c2  0.0.0.0/0            0.0.0.0/0           
+    0     0 DOCKER-ISOLATION-STAGE-2  all  --  br-38fd1a56fad6 !br-38fd1a56fad6  0.0.0.0/0            0.0.0.0/0           
+    0     0 DOCKER-ISOLATION-STAGE-2  all  --  br-5a3504693be8 !br-5a3504693be8  0.0.0.0/0            0.0.0.0/0           
+    0     0 DOCKER-ISOLATION-STAGE-2  all  --  br-7a4b2148d0b8 !br-7a4b2148d0b8  0.0.0.0/0            0.0.0.0/0           
+    0     0 DOCKER-ISOLATION-STAGE-2  all  --  br-d1bf47229317 !br-d1bf47229317  0.0.0.0/0            0.0.0.0/0           
+ 4798  623K DOCKER-ISOLATION-STAGE-2  all  --  docker0 !docker0  0.0.0.0/0            0.0.0.0/0           
+ 170K   17M DOCKER-ISOLATION-STAGE-2  all  --  br-aa09067c82a4 !br-aa09067c82a4  0.0.0.0/0            0.0.0.0/0           
+
+Chain DOCKER-ISOLATION-STAGE-2 (7 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 DROP       all  --  *      br-aa09067c82a4  0.0.0.0/0            0.0.0.0/0           
+    0     0 DROP       all  --  *      docker0  0.0.0.0/0            0.0.0.0/0           
+    0     0 DROP       all  --  *      br-d1bf47229317  0.0.0.0/0            0.0.0.0/0           
+    0     0 DROP       all  --  *      br-7a4b2148d0b8  0.0.0.0/0            0.0.0.0/0           
+    0     0 DROP       all  --  *      br-5a3504693be8  0.0.0.0/0            0.0.0.0/0           
+    0     0 DROP       all  --  *      br-38fd1a56fad6  0.0.0.0/0            0.0.0.0/0           
+    0     0 DROP       all  --  *      br-f58d4c19a6c2  0.0.0.0/0            0.0.0.0/0           
+
+Chain DOCKER-USER (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain LIBVIRT_FWI (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 ACCEPT     all  --  *      virbr0  0.0.0.0/0            192.168.122.0/24     ctstate RELATED,ESTABLISHED
+    0     0 REJECT     all  --  *      virbr0  0.0.0.0/0            0.0.0.0/0            reject-with icmp-port-unreachable
+
+Chain LIBVIRT_FWO (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 ACCEPT     all  --  virbr0 *       192.168.122.0/24     0.0.0.0/0           
+    0     0 REJECT     all  --  virbr0 *       0.0.0.0/0            0.0.0.0/0            reject-with icmp-port-unreachable
+
+Chain LIBVIRT_FWX (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 ACCEPT     all  --  virbr0 virbr0  0.0.0.0/0            0.0.0.0/0           
+
+Chain LIBVIRT_INP (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 ACCEPT     udp  --  virbr0 *       0.0.0.0/0            0.0.0.0/0            udp dpt:53
+    0     0 ACCEPT     tcp  --  virbr0 *       0.0.0.0/0            0.0.0.0/0            tcp dpt:53
+    0     0 ACCEPT     udp  --  virbr0 *       0.0.0.0/0            0.0.0.0/0            udp dpt:67
+    0     0 ACCEPT     tcp  --  virbr0 *       0.0.0.0/0            0.0.0.0/0            tcp dpt:67
+
+Chain LIBVIRT_OUT (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 ACCEPT     udp  --  *      virbr0  0.0.0.0/0            0.0.0.0/0            udp dpt:53
+    0     0 ACCEPT     tcp  --  *      virbr0  0.0.0.0/0            0.0.0.0/0            tcp dpt:53
+    0     0 ACCEPT     udp  --  *      virbr0  0.0.0.0/0            0.0.0.0/0            udp dpt:68
+    0     0 ACCEPT     tcp  --  *      virbr0  0.0.0.0/0            0.0.0.0/0            tcp dpt:68
+
+Chain ufw-after-forward (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain ufw-after-input (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+   60  5760 ufw-skip-to-policy-input  udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp dpt:137
+  327 77243 ufw-skip-to-policy-input  udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp dpt:138
+    0     0 ufw-skip-to-policy-input  tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:139
+    0     0 ufw-skip-to-policy-input  tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:445
+   37 12414 ufw-skip-to-policy-input  udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp dpt:67
+    0     0 ufw-skip-to-policy-input  udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp dpt:68
+11040  533K ufw-skip-to-policy-input  all  --  *      *       0.0.0.0/0            0.0.0.0/0            ADDRTYPE match dst-type BROADCAST
+
+Chain ufw-after-logging-forward (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+   16  1158 LOG        all  --  *      *       0.0.0.0/0            0.0.0.0/0            limit: avg 3/min burst 10 LOG flags 0 level 4 prefix "[UFW BLOCK] "
+
+Chain ufw-after-logging-input (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+ 4259  164K LOG        all  --  *      *       0.0.0.0/0            0.0.0.0/0            limit: avg 3/min burst 10 LOG flags 0 level 4 prefix "[UFW BLOCK] "
+
+Chain ufw-after-logging-output (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain ufw-after-output (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain ufw-before-forward (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+   10  1886 ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED
+    0     0 ACCEPT     icmp --  *      *       0.0.0.0/0            0.0.0.0/0            icmptype 3
+    0     0 ACCEPT     icmp --  *      *       0.0.0.0/0            0.0.0.0/0            icmptype 11
+    0     0 ACCEPT     icmp --  *      *       0.0.0.0/0            0.0.0.0/0            icmptype 12
+    0     0 ACCEPT     icmp --  *      *       0.0.0.0/0            0.0.0.0/0            icmptype 8
+   17  1203 ufw-user-forward  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+
+Chain ufw-before-input (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+  19M 5560M ACCEPT     all  --  lo     *       0.0.0.0/0            0.0.0.0/0           
+2802K 4642M ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED
+   20   800 ufw-logging-deny  all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate INVALID
+   20   800 DROP       all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate INVALID
+    0     0 ACCEPT     icmp --  *      *       0.0.0.0/0            0.0.0.0/0            icmptype 3
+    0     0 ACCEPT     icmp --  *      *       0.0.0.0/0            0.0.0.0/0            icmptype 11
+    0     0 ACCEPT     icmp --  *      *       0.0.0.0/0            0.0.0.0/0            icmptype 12
+ 4980  418K ACCEPT     icmp --  *      *       0.0.0.0/0            0.0.0.0/0            icmptype 8
+    4  1312 ACCEPT     udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp spt:67 dpt:68
+ 166K   37M ufw-not-local  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+36247 2742K ACCEPT     udp  --  *      *       0.0.0.0/0            224.0.0.251          udp dpt:5353
+92728   32M ACCEPT     udp  --  *      *       0.0.0.0/0            239.255.255.250      udp dpt:1900
+36765 2084K ufw-user-input  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+
+Chain ufw-before-logging-forward (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain ufw-before-logging-input (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain ufw-before-logging-output (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain ufw-before-output (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+  19M 5558M ACCEPT     all  --  *      lo      0.0.0.0/0            0.0.0.0/0           
+2330K 1879M ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED
+ 506K   69M ufw-user-output  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+
+Chain ufw-logging-allow (0 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 LOG        all  --  *      *       0.0.0.0/0            0.0.0.0/0            limit: avg 3/min burst 10 LOG flags 0 level 4 prefix "[UFW ALLOW] "
+
+Chain ufw-logging-deny (2 references)
+ pkts bytes target     prot opt in     out     source               destination         
+   12   480 RETURN     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate INVALID limit: avg 3/min burst 10
+    8   320 LOG        all  --  *      *       0.0.0.0/0            0.0.0.0/0            limit: avg 3/min burst 10 LOG flags 0 level 4 prefix "[UFW BLOCK] "
+
+Chain ufw-not-local (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+ 1929  620K RETURN     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ADDRTYPE match dst-type LOCAL
+ 152K   35M RETURN     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ADDRTYPE match dst-type MULTICAST
+11464  629K RETURN     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ADDRTYPE match dst-type BROADCAST
+    0     0 ufw-logging-deny  all  --  *      *       0.0.0.0/0            0.0.0.0/0            limit: avg 3/min burst 10
+    0     0 DROP       all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+
+Chain ufw-reject-forward (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain ufw-reject-input (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain ufw-reject-output (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain ufw-skip-to-policy-forward (0 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 DROP       all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+
+Chain ufw-skip-to-policy-input (7 references)
+ pkts bytes target     prot opt in     out     source               destination         
+11464  629K DROP       all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+
+Chain ufw-skip-to-policy-output (0 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+
+Chain ufw-track-forward (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain ufw-track-input (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain ufw-track-output (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+40535 2432K ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate NEW
+ 422K   62M ACCEPT     udp  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate NEW
+
+Chain ufw-user-forward (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain ufw-user-input (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:80
+    0     0 ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:443
+    0     0 ACCEPT     all  --  vxlan.calico *       0.0.0.0/0            0.0.0.0/0           
+   94  5640 ACCEPT     all  --  cali+  *       0.0.0.0/0            0.0.0.0/0           
+    0     0 ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:16160
+
+Chain ufw-user-limit (0 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 LOG        all  --  *      *       0.0.0.0/0            0.0.0.0/0            limit: avg 3/min burst 5 LOG flags 0 level 4 prefix "[UFW LIMIT BLOCK] "
+    0     0 REJECT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            reject-with icmp-port-unreachable
+
+Chain ufw-user-limit-accept (0 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+
+Chain ufw-user-logging-forward (0 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain ufw-user-logging-input (0 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain ufw-user-logging-output (0 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain ufw-user-output (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+26400 3823K ACCEPT     all  --  *      vxlan.calico  0.0.0.0/0            0.0.0.0/0           
+16939 1016K ACCEPT     all  --  *      cali+   0.0.0.0/0            0.0.0.0/0           
+
+--- Docker Networks ---
+NETWORK ID     NAME                DRIVER    SCOPE
+d1bf47229317   1panel-network      bridge    local
+38fd1a56fad6   app-network         bridge    local
+aae85568c5c9   bridge              bridge    local
+4bd883ffd720   host                host      local
+aa09067c82a4   localai_default     bridge    local
+76c05f93d7ef   none                null      local
+7a4b2148d0b8   openhands_default   bridge    local
+5a3504693be8   rowboat_default     bridge    local
+f58d4c19a6c2   shared-network      bridge    local
+[
+    {
+        "Name": "bridge",
+        "Id": "aae85568c5c9d470aa7d24da0d7c65e4034c578d14a98d90b9ed150f4ec0dc5d",
+        "Created": "2025-07-31T05:50:58.602996125-04:00",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.17.0.0/16",
+                    "Gateway": "172.17.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "06ecbd3692d670eae1da124177d3991ef9eaf07d264cf601c615a94f63848ea3": {
+                "Name": "quirky_lederberg",
+                "EndpointID": "46023947bafd6c9e1ec4cb0248c2a051763070e6de9b5e987bc98f732009cb14",
+                "MacAddress": "d2:1a:b1:d6:44:4f",
+                "IPv4Address": "172.17.0.3/16",
+                "IPv6Address": ""
+            },
+            "b40363fe928a609a8b32080cb07f180eaf250776534670766a7f863440f755f1": {
+                "Name": "trusting_liskov",
+                "EndpointID": "cd61a384d3c6d75c933cd79057dd3123defcc468d0d75860f9d7c5a8d9e35225",
+                "MacAddress": "46:3a:98:d2:8c:a9",
+                "IPv4Address": "172.17.0.2/16",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {
+            "com.docker.network.bridge.default_bridge": "true",
+            "com.docker.network.bridge.enable_icc": "true",
+            "com.docker.network.bridge.enable_ip_masquerade": "true",
+            "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
+            "com.docker.network.bridge.name": "docker0",
+            "com.docker.network.driver.mtu": "1500"
+        },
+        "Labels": {}
+    }
+]
+
+--- Listening Ports ---
+Netid State  Recv-Q Send-Q                               Local Address:Port  Peer Address:PortProcess                                       
+udp   UNCONN 0      0                                    192.168.122.1:53         0.0.0.0:*    users:(("dnsmasq",pid=8076,fd=5))            
+udp   UNCONN 0      0                                     10.170.163.1:53         0.0.0.0:*    users:(("dnsmasq",pid=14116,fd=6))           
+udp   UNCONN 0      0                                       127.0.0.54:53         0.0.0.0:*    users:(("systemd-resolve",pid=1020,fd=16))   
+udp   UNCONN 0      0                                    127.0.0.53%lo:53         0.0.0.0:*    users:(("systemd-resolve",pid=1020,fd=14))   
+udp   UNCONN 0      0                                0.0.0.0%mpqemubr0:67         0.0.0.0:*    users:(("dnsmasq",pid=14116,fd=4))           
+udp   UNCONN 0      0                                   0.0.0.0%virbr0:67         0.0.0.0:*    users:(("dnsmasq",pid=8076,fd=3))            
+udp   UNCONN 0      0                                          0.0.0.0:49354      0.0.0.0:*    users:(("python3",pid=1313896,fd=29))        
+udp   UNCONN 0      0                                172.19.0.1%if4526:49835      0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=32))      
+udp   UNCONN 0      0                         10.1.60.128%vxlan.calico:49835      0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=46))      
+udp   UNCONN 0      0                       172.23.0.1%br-38fd1a56fad6:49835      0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=43))      
+udp   UNCONN 0      0                       172.22.0.1%br-f58d4c19a6c2:49835      0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=42))      
+udp   UNCONN 0      0                       172.21.0.1%br-7a4b2148d0b8:49835      0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=41))      
+udp   UNCONN 0      0                       172.20.0.1%br-d1bf47229317:49835      0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=40))      
+udp   UNCONN 0      0                       172.18.0.1%br-5a3504693be8:49835      0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=38))      
+udp   UNCONN 0      0                               172.17.0.1%docker0:49835      0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=37))      
+udp   UNCONN 0      0                           10.170.163.1%mpqemubr0:49835      0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=22))      
+udp   UNCONN 0      0                            192.168.100.68%enp9s0:49835      0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=21))      
+udp   UNCONN 0      0                             192.168.122.1%virbr0:49835      0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=20))      
+udp   UNCONN 0      0                                          0.0.0.0:33720      0.0.0.0:*    users:(("python3",pid=1313896,fd=8))         
+udp   UNCONN 0      0                                          0.0.0.0:35265      0.0.0.0:*    users:(("tailscaled",pid=5726,fd=16))        
+udp   UNCONN 0      0                                          0.0.0.0:35961      0.0.0.0:*    users:(("python3",pid=1313896,fd=20))        
+udp   UNCONN 0      0                                          0.0.0.0:35995      0.0.0.0:*    users:(("avahi-daemon",pid=4418,fd=14))      
+udp   UNCONN 0      0                                          0.0.0.0:36353      0.0.0.0:*    users:(("python3",pid=1313896,fd=32))        
+udp   UNCONN 0      0                                       172.19.0.1:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=36))        
+udp   UNCONN 0      0                                  239.255.255.250:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=34))        
+udp   UNCONN 0      0                                      10.1.60.128:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=42))        
+udp   UNCONN 0      0                                  239.255.255.250:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=40))        
+udp   UNCONN 0      0                                       172.20.0.1:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=39))        
+udp   UNCONN 0      0                                  239.255.255.250:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=37))        
+udp   UNCONN 0      0                                       172.21.0.1:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=33))        
+udp   UNCONN 0      0                                  239.255.255.250:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=31))        
+udp   UNCONN 0      0                                       172.18.0.1:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=30))        
+udp   UNCONN 0      0                                  239.255.255.250:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=28))        
+udp   UNCONN 0      0                                       172.17.0.1:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=27))        
+udp   UNCONN 0      0                                  239.255.255.250:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=25))        
+udp   UNCONN 0      0                                       172.23.0.1:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=24))        
+udp   UNCONN 0      0                                  239.255.255.250:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=22))        
+udp   UNCONN 0      0                                       172.22.0.1:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=21))        
+udp   UNCONN 0      0                                  239.255.255.250:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=19))        
+udp   UNCONN 0      0                                     10.170.163.1:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=18))        
+udp   UNCONN 0      0                                  239.255.255.250:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=16))        
+udp   UNCONN 0      0                                    172.28.172.82:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=15))        
+udp   UNCONN 0      0                                  239.255.255.250:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=13))        
+udp   UNCONN 0      0                                    192.168.122.1:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=12))        
+udp   UNCONN 0      0                                  239.255.255.250:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=10))        
+udp   UNCONN 0      0                                   192.168.100.68:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=9))         
+udp   UNCONN 0      0                                  239.255.255.250:3702       0.0.0.0:*    users:(("python3",pid=1313896,fd=7))         
+udp   UNCONN 0      0                                          0.0.0.0:4789       0.0.0.0:*                                                 
+udp   UNCONN 0      0                                          0.0.0.0:5353       0.0.0.0:*    users:(("microcloudd",pid=5367,fd=15))       
+udp   UNCONN 0      0                                          0.0.0.0:5353       0.0.0.0:*    users:(("microcloudd",pid=5367,fd=13))       
+udp   UNCONN 0      0                                          0.0.0.0:5353       0.0.0.0:*    users:(("microcloudd",pid=5367,fd=11))       
+udp   UNCONN 0      0                                          0.0.0.0:5353       0.0.0.0:*    users:(("microcloudd",pid=5367,fd=9))        
+udp   UNCONN 0      0                                          0.0.0.0:5353       0.0.0.0:*    users:(("avahi-daemon",pid=4418,fd=12))      
+udp   UNCONN 0      0                                          0.0.0.0:38681      0.0.0.0:*    users:(("python3",pid=1313896,fd=17))        
+udp   UNCONN 0      0                                172.19.0.1%if4526:56881      0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=25))      
+udp   UNCONN 0      0                         10.1.60.128%vxlan.calico:56881      0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=45))      
+udp   UNCONN 0      0                       172.23.0.1%br-38fd1a56fad6:56881      0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=36))      
+udp   UNCONN 0      0                       172.22.0.1%br-f58d4c19a6c2:56881      0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=35))      
+udp   UNCONN 0      0                       172.21.0.1%br-7a4b2148d0b8:56881      0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=34))      
+udp   UNCONN 0      0                       172.20.0.1%br-d1bf47229317:56881      0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=33))      
+udp   UNCONN 0      0                       172.18.0.1%br-5a3504693be8:56881      0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=31))      
+udp   UNCONN 0      0                               172.17.0.1%docker0:56881      0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=30))      
+udp   UNCONN 0      0                           10.170.163.1%mpqemubr0:56881      0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=16))      
+udp   UNCONN 0      0                            192.168.100.68%enp9s0:56881      0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=19))      
+udp   UNCONN 0      0                             192.168.122.1%virbr0:56881      0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=18))      
+udp   UNCONN 0      0                                          0.0.0.0:40629      0.0.0.0:*    users:(("python3",pid=1313896,fd=38))        
+udp   UNCONN 0      0                                          0.0.0.0:41964      0.0.0.0:*    users:(("python3",pid=1313896,fd=14))        
+udp   UNCONN 0      0                                          0.0.0.0:42196      0.0.0.0:*    users:(("python3",pid=1313896,fd=41))        
+udp   UNCONN 0      0                                          0.0.0.0:58613      0.0.0.0:*    users:(("python3",pid=1313896,fd=26))        
+udp   UNCONN 0      0                                172.19.0.1%if4526:9993       0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=9))       
+udp   UNCONN 0      0                         10.1.60.128%vxlan.calico:9993       0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=44))      
+udp   UNCONN 0      0                       172.23.0.1%br-38fd1a56fad6:9993       0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=29))      
+udp   UNCONN 0      0                       172.22.0.1%br-f58d4c19a6c2:9993       0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=28))      
+udp   UNCONN 0      0                       172.21.0.1%br-7a4b2148d0b8:9993       0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=27))      
+udp   UNCONN 0      0                       172.20.0.1%br-d1bf47229317:9993       0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=26))      
+udp   UNCONN 0      0                       172.18.0.1%br-5a3504693be8:9993       0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=24))      
+udp   UNCONN 0      0                               172.17.0.1%docker0:9993       0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=23))      
+udp   UNCONN 0      0                           10.170.163.1%mpqemubr0:9993       0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=6))       
+udp   UNCONN 0      0                            192.168.100.68%enp9s0:9993       0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=17))      
+udp   UNCONN 0      0                             192.168.122.1%virbr0:9993       0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=15))      
+udp   UNCONN 0      0                                          0.0.0.0:43163      0.0.0.0:*    users:(("python3",pid=1313896,fd=35))        
+udp   UNCONN 0      0                                          0.0.0.0:44512      0.0.0.0:*    users:(("python3",pid=1313896,fd=23))        
+udp   UNCONN 0      0                                          0.0.0.0:45242      0.0.0.0:*    users:(("python3",pid=1313896,fd=11))        
+udp   UNCONN 0      0                                                *:47556            *:*    users:(("python3",pid=1313896,fd=74))        
+udp   UNCONN 0      0                                                *:34005            *:*    users:(("python3",pid=1313896,fd=59))        
+udp   UNCONN 0      0                                                *:34318            *:*    users:(("python3",pid=1313896,fd=93))        
+udp   UNCONN 0      0                                                *:51484            *:*    users:(("python3",pid=1313896,fd=50))        
+udp   UNCONN 0      0                                                *:35214            *:*    users:(("python3",pid=1313896,fd=44))        
+udp   UNCONN 0      0                                                *:36143            *:*    users:(("python3",pid=1313896,fd=89))        
+udp   UNCONN 0      0          [fe80::9c64:fdff:fec4:9d09]%vethd74c135:3702          [::]:*    users:(("python3",pid=1313896,fd=97))        
+udp   UNCONN 0      0                            [ff02::c]%vethd74c135:3702          [::]:*    users:(("python3",pid=1313896,fd=95))        
+udp   UNCONN 0      0          [fe80::5021:b3ff:fe30:60e2]%veth7eef0b2:3702          [::]:*    users:(("python3",pid=1313896,fd=78))        
+udp   UNCONN 0      0                            [ff02::c]%veth7eef0b2:3702          [::]:*    users:(("python3",pid=1313896,fd=76))        
+udp   UNCONN 0      0          [fe80::b48d:9cff:fe31:dbd5]%vethfdaa9ca:3702          [::]:*    users:(("python3",pid=1313896,fd=72))        
+udp   UNCONN 0      0                            [ff02::c]%vethfdaa9ca:3702          [::]:*    users:(("python3",pid=1313896,fd=70))        
+udp   UNCONN 0      0          [fe80::4042:62ff:fe6f:7356]%veth8ed7de1:3702          [::]:*    users:(("python3",pid=1313896,fd=66))        
+udp   UNCONN 0      0                            [ff02::c]%veth8ed7de1:3702          [::]:*    users:(("python3",pid=1313896,fd=64))        
+udp   UNCONN 0      0      [fe80::b44c:88ff:fe92:a89e]%br-aa09067c82a4:3702          [::]:*    users:(("python3",pid=1313896,fd=60))        
+udp   UNCONN 0      0                        [ff02::c]%br-aa09067c82a4:3702          [::]:*    users:(("python3",pid=1313896,fd=58))        
+udp   UNCONN 0      0      [fe80::ecee:eeff:feee:eeee]%calicc633e3a70e:3702          [::]:*    users:(("python3",pid=1313896,fd=84))        
+udp   UNCONN 0      0                        [ff02::c]%calicc633e3a70e:3702          [::]:*    users:(("python3",pid=1313896,fd=82))        
+udp   UNCONN 0      0      [fe80::ecee:eeff:feee:eeee]%calie22a2124a42:3702          [::]:*    users:(("python3",pid=1313896,fd=81))        
+udp   UNCONN 0      0                        [ff02::c]%calie22a2124a42:3702          [::]:*    users:(("python3",pid=1313896,fd=79))        
+udp   UNCONN 0      0               [fe80::d041:c1ff:fe11:9ee6]%if4658:3702          [::]:*    users:(("python3",pid=1313896,fd=90))        
+udp   UNCONN 0      0                                 [ff02::c]%if4658:3702          [::]:*    users:(("python3",pid=1313896,fd=88))        
+udp   UNCONN 0      0          [fe80::bc3e:66ff:fe82:db02]%veth939c308:3702          [::]:*    users:(("python3",pid=1313896,fd=94))        
+udp   UNCONN 0      0                            [ff02::c]%veth939c308:3702          [::]:*    users:(("python3",pid=1313896,fd=92))        
+udp   UNCONN 0      0         [fe80::64df:e8ff:fe35:783f]%vxlan.calico:3702          [::]:*    users:(("python3",pid=1313896,fd=87))        
+udp   UNCONN 0      0                           [ff02::c]%vxlan.calico:3702          [::]:*    users:(("python3",pid=1313896,fd=85))        
+udp   UNCONN 0      0          [fe80::f0ae:22ff:fe7c:dfb7]%veth9bd302b:3702          [::]:*    users:(("python3",pid=1313896,fd=75))        
+udp   UNCONN 0      0                            [ff02::c]%veth9bd302b:3702          [::]:*    users:(("python3",pid=1313896,fd=73))        
+udp   UNCONN 0      0          [fe80::380b:2fff:feb4:3ed1]%vetha4f3d0a:3702          [::]:*    users:(("python3",pid=1313896,fd=69))        
+udp   UNCONN 0      0                            [ff02::c]%vetha4f3d0a:3702          [::]:*    users:(("python3",pid=1313896,fd=67))        
+udp   UNCONN 0      0          [fe80::6808:bfff:fec6:f39d]%veth952ea8f:3702          [::]:*    users:(("python3",pid=1313896,fd=63))        
+udp   UNCONN 0      0                            [ff02::c]%veth952ea8f:3702          [::]:*    users:(("python3",pid=1313896,fd=61))        
+udp   UNCONN 0      0      [fe80::901b:e2ff:fecc:ab5b]%br-5a3504693be8:3702          [::]:*    users:(("python3",pid=1313896,fd=57))        
+udp   UNCONN 0      0                        [ff02::c]%br-5a3504693be8:3702          [::]:*    users:(("python3",pid=1313896,fd=55))        
+udp   UNCONN 0      0              [fe80::b81b:5cff:fe62:5af8]%docker0:3702          [::]:*    users:(("python3",pid=1313896,fd=54))        
+udp   UNCONN 0      0                                [ff02::c]%docker0:3702          [::]:*    users:(("python3",pid=1313896,fd=52))        
+udp   UNCONN 0      0           [fe80::11e6:9f7a:76e2:2541]%tailscale0:3702          [::]:*    users:(("python3",pid=1313896,fd=51))        
+udp   UNCONN 0      0                             [ff02::c]%tailscale0:3702          [::]:*    users:(("python3",pid=1313896,fd=49))        
+udp   UNCONN 0      0           [fe80::4cba:dbff:feb7:3845]%ztt6jxripk:3702          [::]:*    users:(("python3",pid=1313896,fd=48))        
+udp   UNCONN 0      0                             [ff02::c]%ztt6jxripk:3702          [::]:*    users:(("python3",pid=1313896,fd=46))        
+udp   UNCONN 0      0               [fe80::f22f:74ff:fe21:e4d8]%enp9s0:3702          [::]:*    users:(("python3",pid=1313896,fd=45))        
+udp   UNCONN 0      0                                 [ff02::c]%enp9s0:3702          [::]:*    users:(("python3",pid=1313896,fd=43))        
+udp   UNCONN 0      0                                                *:36944            *:*    users:(("python3",pid=1313896,fd=62))        
+udp   UNCONN 0      0                                             [::]:53367         [::]:*    users:(("avahi-daemon",pid=4418,fd=15))      
+udp   UNCONN 0      0                                                *:37822            *:*    users:(("python3",pid=1313896,fd=83))        
+udp   UNCONN 0      0                                                *:54301            *:*    users:(("python3",pid=1313896,fd=96))        
+udp   UNCONN 0      0                                                *:38091            *:*    users:(("python3",pid=1313896,fd=77))        
+udp   UNCONN 0      0                                             [::]:5353          [::]:*    users:(("microcloudd",pid=5367,fd=16))       
+udp   UNCONN 0      0                                             [::]:5353          [::]:*    users:(("microcloudd",pid=5367,fd=14))       
+udp   UNCONN 0      0                                             [::]:5353          [::]:*    users:(("microcloudd",pid=5367,fd=12))       
+udp   UNCONN 0      0                                             [::]:5353          [::]:*    users:(("microcloudd",pid=5367,fd=10))       
+udp   UNCONN 0      0                                             [::]:5353          [::]:*    users:(("avahi-daemon",pid=4418,fd=13))      
+udp   UNCONN 0      0                                                *:54694            *:*    users:(("python3",pid=1313896,fd=65))        
+udp   UNCONN 0      0                                             [::]:54983         [::]:*    users:(("tailscaled",pid=5726,fd=17))        
+udp   UNCONN 0      0                                                *:38762            *:*    users:(("python3",pid=1313896,fd=47))        
+udp   UNCONN 0      0                                                *:55988            *:*    users:(("python3",pid=1313896,fd=80))        
+udp   UNCONN 0      0                                                *:56712            *:*    users:(("python3",pid=1313896,fd=56))        
+udp   UNCONN 0      0                                                *:56822            *:*    users:(("python3",pid=1313896,fd=53))        
+udp   UNCONN 0      0                                                *:59589            *:*    users:(("python3",pid=1313896,fd=68))        
+udp   UNCONN 0      0                                                *:43572            *:*    users:(("python3",pid=1313896,fd=86))        
+udp   UNCONN 0      0                                                *:43873            *:*    users:(("python3",pid=1313896,fd=71))        
+tcp   LISTEN 0      4096                                    127.0.0.54:53         0.0.0.0:*    users:(("systemd-resolve",pid=1020,fd=17))   
+tcp   LISTEN 0      4096                                 127.0.0.53%lo:53         0.0.0.0:*    users:(("systemd-resolve",pid=1020,fd=15))   
+tcp   LISTEN 0      1024                                     127.0.0.1:9277       0.0.0.0:*    users:(("warp",pid=2569338,fd=9))            
+tcp   LISTEN 0      511                                      127.0.0.1:41515      0.0.0.0:*    users:(("code",pid=3510629,fd=188))          
+tcp   LISTEN 0      511                                      127.0.0.1:8828       0.0.0.0:*    users:(("code",pid=3510629,fd=142))          
+tcp   LISTEN 0      4096                                     127.0.0.1:9099       0.0.0.0:*    users:(("calico-node",pid=1089073,fd=8))     
+tcp   LISTEN 0      512                                      127.0.0.1:41799      0.0.0.0:*    users:(("opencode",pid=3099188,fd=26))       
+tcp   LISTEN 0      128                                      127.0.0.1:9086       0.0.0.0:*    users:(("refact-lsp",pid=3527426,fd=17))     
+tcp   LISTEN 0      32                                   192.168.122.1:53         0.0.0.0:*    users:(("dnsmasq",pid=8076,fd=6))            
+tcp   LISTEN 0      4096                                       0.0.0.0:6379       0.0.0.0:*    users:(("docker-proxy",pid=23933,fd=7))      
+tcp   LISTEN 0      4096                                     127.0.0.1:11434      0.0.0.0:*    users:(("ollama",pid=7771,fd=3))             
+tcp   LISTEN 0      4096                                     127.0.0.1:11000      0.0.0.0:*    users:(("gs-server",pid=5205,fd=4))          
+tcp   LISTEN 0      4096                                     127.0.0.1:10249      0.0.0.0:*    users:(("kubelite",pid=1084499,fd=87))       
+tcp   LISTEN 0      4096                                     127.0.0.1:10248      0.0.0.0:*    users:(("kubelite",pid=1084499,fd=88))       
+tcp   LISTEN 0      4096                                     127.0.0.1:10256      0.0.0.0:*    users:(("kubelite",pid=1084499,fd=93))       
+tcp   LISTEN 0      128                                      127.0.0.1:27019      0.0.0.0:*    users:(("mongod",pid=14146,fd=6))            
+tcp   LISTEN 0      32                                    10.170.163.1:53         0.0.0.0:*    users:(("dnsmasq",pid=14116,fd=7))           
+tcp   LISTEN 0      511                                      127.0.0.1:5601       0.0.0.0:*    users:(("node",pid=4461,fd=18))              
+tcp   LISTEN 0      4096                                     127.0.0.1:37679      0.0.0.0:*    users:(("language_server",pid=3536925,fd=3)) 
+tcp   LISTEN 0      4096                                       0.0.0.0:27017      0.0.0.0:*    users:(("docker-proxy",pid=24027,fd=7))      
+tcp   LISTEN 0      511                                      127.0.0.1:37337      0.0.0.0:*    users:(("code",pid=3528240,fd=26))           
+tcp   LISTEN 0      5                                          0.0.0.0:9993       0.0.0.0:*    users:(("zerotier-one",pid=7790,fd=7))       
+tcp   LISTEN 0      5                                        127.0.0.1:8085       0.0.0.0:*    users:(("python3",pid=7213,fd=7))            
+tcp   LISTEN 0      4096                                     127.0.0.1:40883      0.0.0.0:*    users:(("language_server",pid=3536925,fd=11))
+tcp   LISTEN 0      511                                      127.0.0.1:40131      0.0.0.0:*    users:(("code",pid=3510629,fd=63))           
+tcp   LISTEN 0      4096                                       0.0.0.0:16160      0.0.0.0:*    users:(("1panel",pid=7769,fd=7))             
+tcp   LISTEN 0      4096                                     127.0.0.1:33795      0.0.0.0:*    users:(("language_server",pid=3536925,fd=18))
+tcp   LISTEN 0      4096                                     127.0.0.1:1338       0.0.0.0:*    users:(("containerd",pid=1084082,fd=10))     
+tcp   LISTEN 0      4096                                     127.0.0.1:33529      0.0.0.0:*    users:(("containerd",pid=1084082,fd=16))     
+tcp   LISTEN 0      4096                                     127.0.0.1:33333      0.0.0.0:*    users:(("gs-server",pid=5205,fd=5))          
+tcp   LISTEN 0      4096                                     127.0.0.1:33343      0.0.0.0:*    users:(("circleci-yaml-l",pid=3531662,fd=3)) 
+tcp   LISTEN 0      4096                                     127.0.0.1:631        0.0.0.0:*    users:(("cupsd",pid=1917958,fd=7))           
+tcp   LISTEN 0      1024                                     127.0.0.1:49159      0.0.0.0:*    users:(("datadog-static-",pid=3509565,fd=9)) 
+tcp   LISTEN 0      4096                                     127.0.0.1:19001      0.0.0.0:*    users:(("k8s-dqlite",pid=5486,fd=16))        
+tcp   LISTEN 0      511                                              *:3028             *:*    users:(("code",pid=3534878,fd=26))           
+tcp   LISTEN 0      50                              [::ffff:127.0.0.1]:64120            *:*    users:(("java",pid=3527349,fd=40))           
+tcp   LISTEN 0      4096                                             *:16443            *:*    users:(("kubelite",pid=1084499,fd=3))        
+tcp   LISTEN 0      50                                               *:8080             *:*    users:(("java",pid=6623,fd=9))               
+tcp   LISTEN 0      511                                              *:7700             *:*    users:(("code",pid=3510629,fd=65))           
+tcp   LISTEN 0      511                                              *:7398             *:*    users:(("node",pid=3260460,fd=23))           
+tcp   LISTEN 0      4096                                          [::]:6379          [::]:*    users:(("docker-proxy",pid=23943,fd=7))      
+tcp   LISTEN 0      4096                                         [::1]:631           [::]:*    users:(("cupsd",pid=1917958,fd=6))           
+tcp   LISTEN 0      4096                                          [::]:27017         [::]:*    users:(("docker-proxy",pid=24035,fd=7))      
+tcp   LISTEN 0      4096                                             *:10259            *:*    users:(("kubelite",pid=1084499,fd=81))       
+tcp   LISTEN 0      4096                                             *:10257            *:*    users:(("kubelite",pid=1084499,fd=89))       
+tcp   LISTEN 0      4096                                             *:10250            *:*    users:(("kubelite",pid=1084499,fd=76))       
+tcp   LISTEN 0      5                                                *:9993             *:*    users:(("zerotier-one",pid=7790,fd=8))       
+tcp   LISTEN 0      1                               [::ffff:127.0.0.1]:8005             *:*    users:(("java",pid=14209,fd=45))             
+tcp   LISTEN 0      4096                                             *:9633             *:*    users:(("smartctl_export",pid=5723,fd=3))    
+tcp   LISTEN 0      4096                                             *:9443             *:*    users:(("microcloudd",pid=5367,fd=8))        
+tcp   LISTEN 0      4096                                             *:9144             *:*    users:(("grok_exporter",pid=7226,fd=7))      
+tcp   LISTEN 0      4096                                             *:9119             *:*    users:(("bind_exporter",pid=5643,fd=3))      
+tcp   LISTEN 0      4096                                             *:9090             *:*    users:(("prometheus",pid=7243,fd=4))         
+tcp   LISTEN 0      511                                              *:9000             *:*    users:(("node",pid=5736,fd=18))              
+tcp   LISTEN 0      4096                                             *:25000            *:*    users:(("cluster-agent",pid=1082187,fd=3))   
+
+--- Recent Network-Related System Logs ---
+Aug 01 05:10:12 cbwamd dockerd[10094]: time="2025-08-01T05:10:12.408060596-04:00" level=info msg="No non-localhost DNS nameservers are left in resolv.conf. Using default external servers"
+Aug 01 05:10:12 cbwamd NetworkManager[4582]: <info>  [1754039412.4304] device (vethbde2e78): carrier: link connected
+Aug 01 05:10:19 cbwamd dockerd[10094]: time="2025-08-01T05:10:19.149721037-04:00" level=info msg="ignoring event" container=47008ae7600c5747408c76a36356dde188db426f431615eb17f2f77df768af55 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 01 05:10:19 cbwamd NetworkManager[4582]: <info>  [1754039419.5049] manager: (vethd7d46fe): new Veth device (/org/freedesktop/NetworkManager/Devices/5299)
+Aug 01 05:10:22 cbwamd NetworkManager[4582]: <info>  [1754039422.5324] manager: (vethe57ebeb): new Veth device (/org/freedesktop/NetworkManager/Devices/5300)
+Aug 01 05:10:22 cbwamd dockerd[10094]: time="2025-08-01T05:10:22.712745694-04:00" level=info msg="No non-localhost DNS nameservers are left in resolv.conf. Using default external servers"
+Aug 01 05:10:22 cbwamd NetworkManager[4582]: <info>  [1754039422.7727] device (vethe57ebeb): carrier: link connected
+Aug 01 05:10:29 cbwamd dockerd[10094]: time="2025-08-01T05:10:29.856331122-04:00" level=info msg="ignoring event" container=47008ae7600c5747408c76a36356dde188db426f431615eb17f2f77df768af55 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 01 05:10:29 cbwamd NetworkManager[4582]: <info>  [1754039429.9431] manager: (veth5642892): new Veth device (/org/freedesktop/NetworkManager/Devices/5301)
+Aug 01 05:10:30 cbwamd NetworkManager[4582]: <info>  [1754039430.5623] manager: (vethb45eb91): new Veth device (/org/freedesktop/NetworkManager/Devices/5302)
+Aug 01 05:10:30 cbwamd NetworkManager[4582]: <info>  [1754039430.6022] device (vethb45eb91): carrier: link connected
+Aug 01 05:10:31 cbwamd dockerd[10094]: time="2025-08-01T05:10:31.752260054-04:00" level=info msg="ignoring event" container=22bf86010fed5b6a9618c3fae82e78f6ccd29a8a5ce0019885c4830f00c46c3a module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 01 05:10:31 cbwamd NetworkManager[4582]: <info>  [1754039431.8405] manager: (veth6b01fce): new Veth device (/org/freedesktop/NetworkManager/Devices/5303)
+Aug 01 05:10:36 cbwamd NetworkManager[4582]: <info>  [1754039436.7888] manager: (veth57b5ad1): new Veth device (/org/freedesktop/NetworkManager/Devices/5304)
+Aug 01 05:10:36 cbwamd dockerd[10094]: time="2025-08-01T05:10:36.798864914-04:00" level=info msg="No non-localhost DNS nameservers are left in resolv.conf. Using default external servers"
+Aug 01 05:10:36 cbwamd NetworkManager[4582]: <info>  [1754039436.8336] device (veth57b5ad1): carrier: link connected
+Aug 01 05:10:44 cbwamd dockerd[10094]: time="2025-08-01T05:10:44.147527393-04:00" level=info msg="ignoring event" container=47008ae7600c5747408c76a36356dde188db426f431615eb17f2f77df768af55 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 01 05:10:44 cbwamd NetworkManager[4582]: <info>  [1754039444.3468] manager: (veth3ed79e8): new Veth device (/org/freedesktop/NetworkManager/Devices/5305)
+Aug 01 05:10:57 cbwamd NetworkManager[4582]: <info>  [1754039457.2424] manager: (veth8da9974): new Veth device (/org/freedesktop/NetworkManager/Devices/5306)
+Aug 01 05:10:57 cbwamd dockerd[10094]: time="2025-08-01T05:10:57.255732505-04:00" level=info msg="No non-localhost DNS nameservers are left in resolv.conf. Using default external servers"
+Aug 01 05:10:57 cbwamd NetworkManager[4582]: <info>  [1754039457.2814] device (veth8da9974): carrier: link connected
+Aug 01 05:11:04 cbwamd dockerd[10094]: time="2025-08-01T05:11:04.323311638-04:00" level=info msg="ignoring event" container=47008ae7600c5747408c76a36356dde188db426f431615eb17f2f77df768af55 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 01 05:11:04 cbwamd NetworkManager[4582]: <info>  [1754039464.6341] manager: (veth6f7d280): new Veth device (/org/freedesktop/NetworkManager/Devices/5307)
+Aug 01 05:11:19 cbwamd NetworkManager[4582]: <info>  [1754039479.5656] manager: (vethd74c135): new Veth device (/org/freedesktop/NetworkManager/Devices/5308)
+Aug 01 05:11:19 cbwamd NetworkManager[4582]: <info>  [1754039479.7524] device (vethd74c135): carrier: link connected
+Aug 01 05:11:30 cbwamd NetworkManager[4582]: <info>  [1754039490.1348] manager: (vethd1aa7ef): new Veth device (/org/freedesktop/NetworkManager/Devices/5309)
+Aug 01 05:11:30 cbwamd dockerd[10094]: time="2025-08-01T05:11:30.277915772-04:00" level=info msg="No non-localhost DNS nameservers are left in resolv.conf. Using default external servers"
+Aug 01 05:11:30 cbwamd NetworkManager[4582]: <info>  [1754039490.3005] device (vethd1aa7ef): carrier: link connected
+Aug 01 05:11:37 cbwamd dockerd[10094]: time="2025-08-01T05:11:37.262063938-04:00" level=info msg="ignoring event" container=47008ae7600c5747408c76a36356dde188db426f431615eb17f2f77df768af55 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 01 05:11:37 cbwamd NetworkManager[4582]: <info>  [1754039497.3371] manager: (veth3fb3670): new Veth device (/org/freedesktop/NetworkManager/Devices/5310)
+Aug 01 05:12:28 cbwamd NetworkManager[4582]: <info>  [1754039548.5703] manager: (veth9443747): new Veth device (/org/freedesktop/NetworkManager/Devices/5311)
+Aug 01 05:12:28 cbwamd dockerd[10094]: time="2025-08-01T05:12:28.586234339-04:00" level=info msg="No non-localhost DNS nameservers are left in resolv.conf. Using default external servers"
+Aug 01 05:12:28 cbwamd NetworkManager[4582]: <info>  [1754039548.6080] device (veth9443747): carrier: link connected
+Aug 01 05:12:34 cbwamd dockerd[10094]: time="2025-08-01T05:12:34.999566626-04:00" level=info msg="ignoring event" container=47008ae7600c5747408c76a36356dde188db426f431615eb17f2f77df768af55 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 01 05:12:35 cbwamd NetworkManager[4582]: <info>  [1754039555.3912] manager: (veth1ca85ba): new Veth device (/org/freedesktop/NetworkManager/Devices/5312)
+Aug 01 05:13:35 cbwamd NetworkManager[4582]: <info>  [1754039615.1137] manager: (veth1ee0f06): new Veth device (/org/freedesktop/NetworkManager/Devices/5313)
+Aug 01 05:13:35 cbwamd dockerd[10094]: time="2025-08-01T05:13:35.135568653-04:00" level=info msg="No non-localhost DNS nameservers are left in resolv.conf. Using default external servers"
+Aug 01 05:13:35 cbwamd NetworkManager[4582]: <info>  [1754039615.1538] device (veth1ee0f06): carrier: link connected
+Aug 01 05:13:41 cbwamd dockerd[10094]: time="2025-08-01T05:13:41.477631260-04:00" level=info msg="ignoring event" container=47008ae7600c5747408c76a36356dde188db426f431615eb17f2f77df768af55 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 01 05:13:41 cbwamd NetworkManager[4582]: <info>  [1754039621.7257] manager: (veth2cffcde): new Veth device (/org/freedesktop/NetworkManager/Devices/5314)
+Aug 01 05:14:42 cbwamd NetworkManager[4582]: <info>  [1754039682.9475] manager: (vethcc832f8): new Veth device (/org/freedesktop/NetworkManager/Devices/5315)
+Aug 01 05:14:43 cbwamd dockerd[10094]: time="2025-08-01T05:14:43.010897249-04:00" level=info msg="No non-localhost DNS nameservers are left in resolv.conf. Using default external servers"
+Aug 01 05:14:43 cbwamd NetworkManager[4582]: <info>  [1754039683.0286] device (vethcc832f8): carrier: link connected
+Aug 01 05:14:49 cbwamd dockerd[10094]: time="2025-08-01T05:14:49.487740566-04:00" level=info msg="ignoring event" container=47008ae7600c5747408c76a36356dde188db426f431615eb17f2f77df768af55 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 01 05:14:49 cbwamd NetworkManager[4582]: <info>  [1754039689.9188] manager: (vetha9b5087): new Veth device (/org/freedesktop/NetworkManager/Devices/5316)
+Aug 01 05:14:52 cbwamd dockerd[10094]: time="2025-08-01T05:14:52.313578781-04:00" level=error msg="[resolver] failed to query external DNS server" client-addr="udp:127.0.0.1:46904" dns-server="udp:127.0.0.53:53" error="read udp 127.0.0.1:46904->127.0.0.53:53: i/o timeout" question=";http-intake.logs.datadoghq.com.\tIN\t A"
+Aug 01 05:15:49 cbwamd NetworkManager[4582]: <info>  [1754039749.7924] manager: (veth61e80ce): new Veth device (/org/freedesktop/NetworkManager/Devices/5317)
+Aug 01 05:15:49 cbwamd dockerd[10094]: time="2025-08-01T05:15:49.966678375-04:00" level=info msg="No non-localhost DNS nameservers are left in resolv.conf. Using default external servers"
+Aug 01 05:15:49 cbwamd NetworkManager[4582]: <info>  [1754039749.9911] device (veth61e80ce): carrier: link connected
+Aug 01 05:15:56 cbwamd dockerd[10094]: time="2025-08-01T05:15:56.590654428-04:00" level=info msg="ignoring event" container=47008ae7600c5747408c76a36356dde188db426f431615eb17f2f77df768af55 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 01 05:15:56 cbwamd NetworkManager[4582]: <info>  [1754039756.8469] manager: (veth01747d5): new Veth device (/org/freedesktop/NetworkManager/Devices/5318)
+Aug 01 05:15:59 cbwamd dockerd[10094]: time="2025-08-01T05:15:59.207131411-04:00" level=error msg="[resolver] failed to query external DNS server" client-addr="udp:127.0.0.1:39870" dns-server="udp:127.0.0.53:53" error="read udp 127.0.0.1:39870->127.0.0.53:53: i/o timeout" question=";http-intake.logs.ap1.datadoghq.com.\tIN\t A"
+Aug 01 05:15:59 cbwamd dockerd[10094]: time="2025-08-01T05:15:59.209366638-04:00" level=error msg="[resolver] failed to query external DNS server" client-addr="udp:127.0.0.1:36962" dns-server="udp:127.0.0.53:53" error="read udp 127.0.0.1:36962->127.0.0.53:53: i/o timeout" question=";http-intake.logs.datadoghq.com.\tIN\t A"
+Aug 01 05:16:56 cbwamd NetworkManager[4582]: <info>  [1754039816.7850] manager: (vethbc149ea): new Veth device (/org/freedesktop/NetworkManager/Devices/5319)
+Aug 01 05:16:56 cbwamd dockerd[10094]: time="2025-08-01T05:16:56.847027928-04:00" level=info msg="No non-localhost DNS nameservers are left in resolv.conf. Using default external servers"
+Aug 01 05:16:56 cbwamd NetworkManager[4582]: <info>  [1754039816.8669] device (vethbc149ea): carrier: link connected
+Aug 01 05:17:03 cbwamd dockerd[10094]: time="2025-08-01T05:17:03.248199874-04:00" level=info msg="ignoring event" container=47008ae7600c5747408c76a36356dde188db426f431615eb17f2f77df768af55 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 01 05:17:03 cbwamd NetworkManager[4582]: <info>  [1754039823.3156] manager: (veth9444cf7): new Veth device (/org/freedesktop/NetworkManager/Devices/5320)
+Aug 01 05:18:03 cbwamd NetworkManager[4582]: <info>  [1754039883.5240] manager: (veth9659d15): new Veth device (/org/freedesktop/NetworkManager/Devices/5321)
+Aug 01 05:18:03 cbwamd dockerd[10094]: time="2025-08-01T05:18:03.665447261-04:00" level=info msg="No non-localhost DNS nameservers are left in resolv.conf. Using default external servers"
+Aug 01 05:18:03 cbwamd NetworkManager[4582]: <info>  [1754039883.6827] device (veth9659d15): carrier: link connected
+Aug 01 05:18:10 cbwamd dockerd[10094]: time="2025-08-01T05:18:10.089289561-04:00" level=info msg="ignoring event" container=47008ae7600c5747408c76a36356dde188db426f431615eb17f2f77df768af55 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 01 05:18:11 cbwamd NetworkManager[4582]: <info>  [1754039891.9401] manager: (veth65a6b5c): new Veth device (/org/freedesktop/NetworkManager/Devices/5322)
+Aug 01 05:19:10 cbwamd NetworkManager[4582]: <info>  [1754039950.4494] manager: (vethd7e54d3): new Veth device (/org/freedesktop/NetworkManager/Devices/5323)
+Aug 01 05:19:10 cbwamd dockerd[10094]: time="2025-08-01T05:19:10.460013337-04:00" level=info msg="No non-localhost DNS nameservers are left in resolv.conf. Using default external servers"
+Aug 01 05:19:10 cbwamd NetworkManager[4582]: <info>  [1754039950.4870] device (vethd7e54d3): carrier: link connected
+Aug 01 05:19:16 cbwamd dockerd[10094]: time="2025-08-01T05:19:16.954022776-04:00" level=info msg="ignoring event" container=47008ae7600c5747408c76a36356dde188db426f431615eb17f2f77df768af55 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 01 05:19:17 cbwamd NetworkManager[4582]: <info>  [1754039957.2407] manager: (vethd6d2cea): new Veth device (/org/freedesktop/NetworkManager/Devices/5324)
+Aug 01 05:20:17 cbwamd NetworkManager[4582]: <info>  [1754040017.0722] manager: (veth7b0d8be): new Veth device (/org/freedesktop/NetworkManager/Devices/5325)
+Aug 01 05:20:17 cbwamd dockerd[10094]: time="2025-08-01T05:20:17.107985242-04:00" level=info msg="No non-localhost DNS nameservers are left in resolv.conf. Using default external servers"
+Aug 01 05:20:17 cbwamd NetworkManager[4582]: <info>  [1754040017.1268] device (veth7b0d8be): carrier: link connected
+Aug 01 05:20:24 cbwamd dockerd[10094]: time="2025-08-01T05:20:24.442480735-04:00" level=info msg="ignoring event" container=47008ae7600c5747408c76a36356dde188db426f431615eb17f2f77df768af55 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 01 05:20:24 cbwamd NetworkManager[4582]: <info>  [1754040024.7131] manager: (veth15308e2): new Veth device (/org/freedesktop/NetworkManager/Devices/5326)
+Aug 01 05:21:24 cbwamd NetworkManager[4582]: <info>  [1754040084.6859] manager: (veth39488b6): new Veth device (/org/freedesktop/NetworkManager/Devices/5327)
+Aug 01 05:21:24 cbwamd dockerd[10094]: time="2025-08-01T05:21:24.780851895-04:00" level=info msg="No non-localhost DNS nameservers are left in resolv.conf. Using default external servers"
+Aug 01 05:21:24 cbwamd NetworkManager[4582]: <info>  [1754040084.7990] device (veth39488b6): carrier: link connected
+Aug 01 05:21:31 cbwamd dockerd[10094]: time="2025-08-01T05:21:31.308081123-04:00" level=info msg="ignoring event" container=47008ae7600c5747408c76a36356dde188db426f431615eb17f2f77df768af55 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 01 05:21:31 cbwamd NetworkManager[4582]: <info>  [1754040091.5708] manager: (vethf148d13): new Veth device (/org/freedesktop/NetworkManager/Devices/5328)
+Aug 01 05:21:34 cbwamd dockerd[10094]: time="2025-08-01T05:21:34.127592950-04:00" level=error msg="[resolver] failed to query external DNS server" client-addr="udp:127.0.0.1:44531" dns-server="udp:127.0.0.53:53" error="read udp 127.0.0.1:44531->127.0.0.53:53: i/o timeout" question=";http-intake.logs.datadoghq.com.\tIN\t A"
+Aug 01 05:22:31 cbwamd NetworkManager[4582]: <info>  [1754040151.6444] manager: (veth51297ae): new Veth device (/org/freedesktop/NetworkManager/Devices/5329)
+Aug 01 05:22:31 cbwamd dockerd[10094]: time="2025-08-01T05:22:31.655164322-04:00" level=info msg="No non-localhost DNS nameservers are left in resolv.conf. Using default external servers"
+Aug 01 05:22:31 cbwamd NetworkManager[4582]: <info>  [1754040151.6830] device (veth51297ae): carrier: link connected
+Aug 01 05:22:38 cbwamd dockerd[10094]: time="2025-08-01T05:22:38.275927787-04:00" level=info msg="ignoring event" container=47008ae7600c5747408c76a36356dde188db426f431615eb17f2f77df768af55 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 01 05:22:38 cbwamd NetworkManager[4582]: <info>  [1754040158.6583] manager: (veth1f14509): new Veth device (/org/freedesktop/NetworkManager/Devices/5330)
+Aug 01 05:23:38 cbwamd NetworkManager[4582]: <info>  [1754040218.5681] manager: (vethdb981f7): new Veth device (/org/freedesktop/NetworkManager/Devices/5331)
+Aug 01 05:23:38 cbwamd dockerd[10094]: time="2025-08-01T05:23:38.636858948-04:00" level=info msg="No non-localhost DNS nameservers are left in resolv.conf. Using default external servers"
+Aug 01 05:23:38 cbwamd NetworkManager[4582]: <info>  [1754040218.6542] device (vethdb981f7): carrier: link connected
+Aug 01 05:23:45 cbwamd dockerd[10094]: time="2025-08-01T05:23:45.418831833-04:00" level=info msg="ignoring event" container=47008ae7600c5747408c76a36356dde188db426f431615eb17f2f77df768af55 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 01 05:23:45 cbwamd NetworkManager[4582]: <info>  [1754040225.6819] manager: (veth93aa376): new Veth device (/org/freedesktop/NetworkManager/Devices/5332)
+Aug 01 05:24:45 cbwamd NetworkManager[4582]: <info>  [1754040285.5796] manager: (vethd61a9c5): new Veth device (/org/freedesktop/NetworkManager/Devices/5333)
+Aug 01 05:24:45 cbwamd dockerd[10094]: time="2025-08-01T05:24:45.724218905-04:00" level=info msg="No non-localhost DNS nameservers are left in resolv.conf. Using default external servers"
+Aug 01 05:24:45 cbwamd NetworkManager[4582]: <info>  [1754040285.7411] device (vethd61a9c5): carrier: link connected
+Aug 01 05:24:52 cbwamd dockerd[10094]: time="2025-08-01T05:24:52.472045007-04:00" level=info msg="ignoring event" container=47008ae7600c5747408c76a36356dde188db426f431615eb17f2f77df768af55 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 01 05:24:52 cbwamd NetworkManager[4582]: <info>  [1754040292.9418] manager: (vethbf48746): new Veth device (/org/freedesktop/NetworkManager/Devices/5334)
+Aug 01 05:25:52 cbwamd NetworkManager[4582]: <info>  [1754040352.7741] manager: (veth524e7be): new Veth device (/org/freedesktop/NetworkManager/Devices/5335)
+Aug 01 05:25:52 cbwamd dockerd[10094]: time="2025-08-01T05:25:52.911527738-04:00" level=info msg="No non-localhost DNS nameservers are left in resolv.conf. Using default external servers"
+Aug 01 05:25:52 cbwamd NetworkManager[4582]: <info>  [1754040352.9334] device (veth524e7be): carrier: link connected
+Aug 01 05:25:59 cbwamd dockerd[10094]: time="2025-08-01T05:25:59.837994700-04:00" level=info msg="ignoring event" container=47008ae7600c5747408c76a36356dde188db426f431615eb17f2f77df768af55 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 01 05:26:00 cbwamd NetworkManager[4582]: <info>  [1754040360.0928] manager: (vethf2a04f5): new Veth device (/org/freedesktop/NetworkManager/Devices/5336)
+Aug 01 05:26:02 cbwamd dockerd[10094]: time="2025-08-01T05:26:02.630479557-04:00" level=error msg="[resolver] failed to query external DNS server" client-addr="udp:127.0.0.1:45700" dns-server="udp:127.0.0.53:53" error="read udp 127.0.0.1:45700->127.0.0.53:53: i/o timeout" question=";http-intake.logs.datadoghq.com.\tIN\t A"
+
+--- dmesg Network Events ---
+
+--- Docker Containers ---
+CONTAINER ID   IMAGE                                      COMMAND                   CREATED          STATUS                          PORTS                                                              NAMES
+06ecbd3692d6   ghcr.io/github/github-mcp-server           "/server/github-mcp-…"    15 minutes ago   Up 15 minutes                                                                                      quirky_lederberg
+72bb595009b6   supabase/storage-api:v1.25.7               "docker-entrypoint.s…"    2 hours ago      Created                                                                                            supabase-storage
+d61a7832811e   supabase/postgres-meta:v0.91.0             "docker-entrypoint.s…"    2 hours ago      Created                                                                                            supabase-meta
+02c90beab21b   supabase/studio:2025.06.30-sha-6f5982d     "docker-entrypoint.s…"    2 hours ago      Created                                                                                            supabase-studio
+3b6f5507fbac   supabase/realtime:v2.34.47                 "/usr/bin/tini -s -g…"    2 hours ago      Created                                                                                            realtime-dev.supabase-realtime
+a043b6abd06b   postgrest/postgrest:v12.2.12               "postgrest"               2 hours ago      Created                                                                                            supabase-rest
+725a532c93fd   supabase/gotrue:v2.177.0                   "auth"                    2 hours ago      Created                                                                                            supabase-auth
+f8abe70ef782   supabase/edge-runtime:v1.67.4              "edge-runtime start …"    2 hours ago      Created                                                                                            supabase-edge-functions
+311b299657cb   kong:2.8.1                                 "bash -c 'eval \"echo…"   2 hours ago      Created                                                                                            supabase-kong
+1de88d853e41   supabase/supavisor:2.5.7                   "/usr/bin/tini -s -g…"    2 hours ago      Created                                                                                            supabase-pooler
+47008ae7600c   supabase/logflare:1.14.2                   "sh run.sh"               2 hours ago      Restarting (1) 55 seconds ago                                                                      supabase-analytics
+94f6dc087b86   supabase/postgres:15.8.1.060               "docker-entrypoint.s…"    2 hours ago      Up 2 hours (healthy)            5432/tcp                                                           supabase-db
+14af36364f95   darthsim/imgproxy:v3.8.0                   "imgproxy"                2 hours ago      Up 2 hours (healthy)            8080/tcp                                                           supabase-imgproxy
+37636906f26d   timberio/vector:0.28.1-alpine              "/usr/local/bin/vect…"    2 hours ago      Up 2 hours (healthy)                                                                               supabase-vector
+e55b23c13caf   rabbitmq:management                        "docker-entrypoint.s…"    47 hours ago     Created                                                                                            rabbitmq
+55c63a24248d   redis:latest                               "docker-entrypoint.s…"    47 hours ago     Created                                                                                            autogpt_platform-redis-1
+7df7693451d6   clamav/clamav-debian:latest                "/init"                   47 hours ago     Created                                                                                            autogpt_platform-clamav-1
+296953f3bf8e   agent0ai/agent-zero                        "/exe/initialize.sh …"    2 days ago       Created                                                                                            laughing_spence
+de01abdab208   agent0ai/agent-zero                        "/exe/initialize.sh …"    2 days ago       Exited (255) 24 hours ago       22/tcp, 9000-9009/tcp, 0.0.0.0:50001->80/tcp, [::]:50001->80/tcp   infallible_turing
+b40363fe928a   mcr.microsoft.com/devcontainers/python:3   "/bin/sh -c 'echo Co…"    2 days ago       Up 4 hours                                                                                         trusting_liskov
+1d3e7236672d   openhands:latest                           "/app/entrypoint.sh …"    2 days ago       Exited (137) 2 days ago                                                                            openhands-app-
+010c6b34de89   qdrant/qdrant                              "./entrypoint.sh"         2 days ago       Exited (255) 2 days ago         0.0.0.0:6333->6333/tcp, [::]:6333->6333/tcp, 6334/tcp              qdrant_instance
+84c1ff00b1cb   6c2e42878dbe                               "docker-entrypoint.s…"    10 days ago      Up 24 hours                                                                                        rowboat-rag_text_worker-1
+196fc0977029   redis:latest                               "docker-entrypoint.s…"    12 days ago      Up 24 hours                     0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp                        rowboat-redis-1
+91d9321e2c46   mongo:latest                               "docker-entrypoint.s…"    12 days ago      Up 24 hours                     0.0.0.0:27017->27017/tcp, [::]:27017->27017/tcp                    rowboat-mongo-1
+
+==== END OF REPORT ====

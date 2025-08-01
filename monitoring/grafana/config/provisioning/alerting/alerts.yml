@@ -1,0 +1,36 @@
+apiVersion: 1
+
+groups:
+  - name: System Alerts
+    folder: System
+    interval: 1m
+    rules:
+      - title: High CPU Usage
+        condition: |
+          avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100 < 20
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High CPU usage detected
+          description: CPU usage is above 80% for 5 minutes
+
+      - title: High Memory Usage
+        condition: |
+          (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High memory usage detected
+          description: Memory usage is above 90% for 5 minutes
+
+      - title: Disk Space Running Low
+        condition: |
+          (node_filesystem_size_bytes - node_filesystem_free_bytes) / node_filesystem_size_bytes * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Disk space is running low
+          description: Disk usage is above 85% for 5 minutes
