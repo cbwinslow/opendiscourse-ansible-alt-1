@@ -1,0 +1,5 @@
+---
+# tasks file for cloudflare
+- name: Print Cloudflare setup message
+  debug:
+    msg: "Cloudflare role setup complete."

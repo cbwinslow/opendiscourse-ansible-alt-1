@@ -1,0 +1,7 @@
+---
+postgresql_enabled: true
+postgresql_version: "15"
+neo4j_enabled: true
+neo4j_version: "5.12"
+opensearch_enabled: true
+opensearch_version: "2.12"

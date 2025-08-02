@@ -1,0 +1,13 @@
+---
+- name: restart postgresql
+  systemd:
+    name: postgresql
+    state: restarted
+- name: restart neo4j
+  systemd:
+    name: neo4j
+    state: restarted
+- name: restart opensearch
+  systemd:
+    name: opensearch
+    state: restarted

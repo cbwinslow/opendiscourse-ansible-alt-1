@@ -1,0 +1,17 @@
+---
+- name: Test FastAPI to PostgreSQL Integration
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Call FastAPI endpoint that queries PostgreSQL
+      uri:
+        url: "http://{{ fastapi_host }}:{{ fastapi_port }}/dbtest"
+        method: GET
+        status_code: 200
+      register: fastapi_dbtest
+      ignore_errors: true
+    - name: Assert FastAPI DB test endpoint returns 200
+      assert:
+        that:
+          - fastapi_dbtest.status == 200
+      when: fastapi_dbtest is defined

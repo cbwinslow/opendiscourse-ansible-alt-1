@@ -1,2 +1,4 @@
 ---
 flowise_base_dir: /opt/flowise
+flowise_host: "{{ flowise_host }}"
+flowise_port: "{{ flowise_port }}"

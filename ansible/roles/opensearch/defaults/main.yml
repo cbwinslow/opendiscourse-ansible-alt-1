@@ -1,0 +1,16 @@
+---
+opensearch_enabled: true
+opensearch_version: "2.12.0"
+opensearch_port: "{{ opensearch_port }}"
+opensearch_dashboards_port: "{{ opensearch_dashboards_port }}"
+opensearch_network: "opendiscourse_network"
+opensearch_cluster_name: "opendiscourse-cluster"
+opensearch_node_name: "opendiscourse-node-1"
+opensearch_data_dir: "/opt/opensearch/data"
+opensearch_config_dir: "/opt/opensearch/config"
+opensearch_dashboards_enabled: true
+opensearch_dashboards_repo: "https://github.com/opensearch-project/dashboards.git"
+opensearch_dashboards_version: "main"
+opensearch_monitoring_enabled: true
+prometheus_enabled: true
+prometheus_port: "{{ prometheus_port }}"

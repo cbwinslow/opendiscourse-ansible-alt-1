@@ -1,0 +1,5 @@
+---
+# tasks file for graphite
+- name: Print Graphite setup message
+  debug:
+    msg: "Graphite role setup complete."

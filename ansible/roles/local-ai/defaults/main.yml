@@ -3,8 +3,8 @@
 local_ai_base_dir: /opt/local-ai
 local_ai_user: localai
 local_ai_group: localai
-local_ai_port: 8080
-local_ai_host: 0.0.0.0
+local_ai_port: "{{ localai_port }}"
+local_ai_host: "{{ localai_host }}"
 local_ai_debug: false
 local_ai_log_level: info
 

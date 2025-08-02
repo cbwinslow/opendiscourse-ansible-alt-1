@@ -1,0 +1,22 @@
+---
+- name: Integrate OpenSearch with Monitoring and Vector DBs
+  hosts: all
+  become: true
+  tasks:
+    - name: Ensure OpenSearch metrics are available to Prometheus
+      lineinfile:
+        path: /etc/prometheus/prometheus.yml
+        line: "  - job_name: 'opensearch'\n    static_configs:\n      - targets: ['localhost:9200']"
+        insertafter: EOF
+      notify: restart prometheus
+
+    - name: Ensure OpenSearch logs are available to Loki
+      lineinfile:
+        path: /etc/loki/loki-config.yml
+        line: "  - job_name: 'opensearch'\n    static_configs:\n      - targets: ['localhost:9200']"
+        insertafter: EOF
+      notify: restart loki
+
+    - name: Integrate OpenSearch with Qdrant and Supabase
+      debug:
+        msg: "Ensure all vector DBs share data with OpenSearch. Manual integration may be required."

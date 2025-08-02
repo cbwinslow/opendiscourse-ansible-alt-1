@@ -2,6 +2,9 @@
 # monitor_llm_service.sh
 # Monitors LLM chat service containers for restarts, errors, and network changes
 
+# Trap Ctrl+C to exit gracefully
+trap 'echo -e "\nMonitoring stopped."; exit 0' INT
+
 # List of likely LLM/chat containers (edit as needed)
 CONTAINERS=$(docker ps --format '{{.Names}}' | grep -E 'openwebui|n8n|ollama|flowise|langfuse')
 
@@ -25,6 +28,10 @@ while true; do
   docker network ls
   echo "\n--- Timestamp: $(date) ---"
   sleep 30
-  clear
+  if command -v clear >/dev/null 2>&1; then
+    clear
+  else
+    echo -e "\n$(printf '=%.0s' {1..50})\n"
+  fi
   echo "Press Ctrl+C to stop monitoring."
 done

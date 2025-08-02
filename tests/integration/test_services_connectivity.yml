@@ -1,0 +1,166 @@
+---
+- name: Test Connectivity to Shared Services
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Check PostgreSQL connection
+      community.postgresql.postgresql_ping:
+        login_host: "{{ postgres_host }}"
+        login_port: "{{ postgres_port }}"
+        login_user: "{{ postgres_admin_user }}"
+        login_password: "{{ postgres_admin_password }}"
+      register: pg_ping
+      ignore_errors: true
+
+    - name: Assert PostgreSQL is reachable
+      assert:
+        that:
+          - pg_ping.is_available
+      when: pg_ping is defined
+
+    - name: Check RabbitMQ port
+      wait_for:
+        host: "{{ rabbitmq_host }}"
+        port: "{{ rabbitmq_port }}"
+        timeout: 5
+      register: rabbitmq_result
+      ignore_errors: true
+
+    - name: Assert RabbitMQ is reachable
+      assert:
+        that:
+          - rabbitmq_result.elapsed < 5
+      when: rabbitmq_result is defined
+
+    - name: Check Neo4j port
+      wait_for:
+        host: "{{ neo4j_host }}"
+        port: "{{ neo4j_port }}"
+        timeout: 5
+      register: neo4j_result
+      ignore_errors: true
+
+    - name: Assert Neo4j is reachable
+      assert:
+        that:
+          - neo4j_result.elapsed < 5
+      when: neo4j_result is defined
+
+    - name: Check LocalAI port
+      wait_for:
+        host: "{{ localai_host }}"
+        port: "{{ localai_port }}"
+        timeout: 5
+      register: localai_result
+      ignore_errors: true
+
+    - name: Assert LocalAI is reachable
+      assert:
+        that:
+          - localai_result.elapsed < 5
+      when: localai_result is defined
+
+    - name: Check Langfuse port
+      wait_for:
+        host: "{{ langfuse_host }}"
+        port: "{{ langfuse_port }}"
+        timeout: 5
+      register: langfuse_result
+      ignore_errors: true
+
+    - name: Assert Langfuse is reachable
+      assert:
+        that:
+          - langfuse_result.elapsed < 5
+      when: langfuse_result is defined
+
+    - name: Check Caddy port
+      wait_for:
+        host: "{{ caddy_host }}"
+        port: "{{ caddy_port }}"
+        timeout: 5
+      register: caddy_result
+      ignore_errors: true
+
+    - name: Assert Caddy is reachable
+      assert:
+        that:
+          - caddy_result.elapsed < 5
+      when: caddy_result is defined
+
+    - name: Check Docker port
+      wait_for:
+        host: "{{ docker_host }}"
+        port: "{{ docker_port }}"
+        timeout: 5
+      register: docker_result
+      ignore_errors: true
+
+    - name: Assert Docker is reachable
+      assert:
+        that:
+          - docker_result.elapsed < 5
+      when: docker_result is defined
+
+    - name: Check Opensearch port
+      wait_for:
+        host: "{{ opensearch_host }}"
+        port: "{{ opensearch_port }}"
+        timeout: 5
+      register: opensearch_result
+      ignore_errors: true
+
+    - name: Assert Opensearch is reachable
+      assert:
+        that:
+          - opensearch_result.elapsed < 5
+      when: opensearch_result is defined
+
+    - name: Check Flowise port
+      wait_for:
+        host: "{{ flowise_host }}"
+        port: "{{ flowise_port }}"
+        timeout: 5
+      register: flowise_result
+      ignore_errors: true
+
+    - name: Assert Flowise is reachable
+      assert:
+        that:
+          - flowise_result.elapsed < 5
+      when: flowise_result is defined
+
+    - name: Check Prometheus port
+      wait_for:
+        host: "{{ prometheus_host }}"
+        port: "{{ prometheus_port }}"
+        timeout: 5
+      register: prometheus_result
+      ignore_errors: true
+
+    - name: Assert Prometheus is reachable
+      assert:
+        that:
+          - prometheus_result.elapsed < 5
+      when: prometheus_result is defined
+
+    - name: Check Grafana port
+      wait_for:
+        host: "{{ grafana_host }}"
+        port: "{{ grafana_port }}"
+        timeout: 5
+      register: grafana_result
+      ignore_errors: true
+
+    - name: Assert Grafana is reachable
+      assert:
+        that:
+          - grafana_result.elapsed < 5
+      when: grafana_result is defined
+
+    - name: Check Security updates variable
+      assert:
+        that:
+          - security_updates_enabled is defined
+          - security_updates_enabled == true
+

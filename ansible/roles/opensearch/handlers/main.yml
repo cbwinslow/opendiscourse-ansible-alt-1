@@ -1,0 +1,11 @@
+---
+- name: restart opensearch
+  systemd:
+    name: opensearch
+    state: restarted
+    daemon_reload: yes
+- name: restart opensearch-dashboards
+  systemd:
+    name: opensearch-dashboards
+    state: restarted
+    daemon_reload: yes

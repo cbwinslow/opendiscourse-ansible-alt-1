@@ -1,0 +1,10 @@
+---
+# tasks file for llamaindex
+- name: Ensure LlamaIndex is installed
+  pip:
+    name: llama-index
+    state: present
+
+- name: Print LlamaIndex setup message
+  debug:
+    msg: "LlamaIndex role setup complete."

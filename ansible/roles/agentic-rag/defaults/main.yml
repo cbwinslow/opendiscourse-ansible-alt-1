@@ -1,20 +1,36 @@
 ---
-agentic_rag_base_dir: /opt/agentic-rag
+# Core Configuration
+agentic_rag_enabled: true
 agentic_rag_version: "latest"
-agentic_rag_port: 8000
-agentic_rag_data_dir: "{{ agentic_rag_base_dir }}/data"
-agentic_rag_config_dir: "{{ agentic_rag_base_dir }}/config"
-agentic_rag_models_dir: "{{ agentic_rag_base_dir }}/models"
-agentic_rag_notebooks_dir: "{{ agentic_rag_base_dir }}/notebooks"
+agentic_rag_port: 8001
+agentic_rag_host: "{{ agentic_rag_host }}"
 agentic_rag_user: "agenticrag"
 agentic_rag_group: "agenticrag"
-agentic_rag_environment: "test"
-agentic_rag_log_level: "DEBUG"
-agentic_rag_max_workers: 4
-agentic_rag_metrics_enabled: true
-agentic_rag_log_file: "/var/log/agentic-rag/test.log"
-agentic_rag_api_key: "test_api_key_123"
-agentic_rag_vector_store: "weaviate"  # or "qdrant", "pgvector"
-agentic_rag_llm_provider: "localai"  # or "openai", "anthropic", etc.
-agentic_rag_embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
-agentic_rag_llm_model: "ggml-gpt4all-j"
+agentic_rag_base_dir: "/opt/agentic-rag"
+agentic_rag_config_dir: "{{ agentic_rag_base_dir }}/config"
+agentic_rag_data_dir: "{{ agentic_rag_base_dir }}/data"
+agentic_rag_log_dir: "/var/log/agentic-rag"
+
+# Vector Store Integration
+vector_store_type: "weaviate"
+vector_store_api_key: ""
+vector_store_url: "http://{{ localai_host }}:{{ localai_port }}"
+# LLM Configuration
+llm_provider: "local-ai"
+llm_api_url: "http://{{ localai_host }}:{{ localai_port }}/v1"
+llm_model: "mistral-7b"
+
+# Langfuse Integration
+langfuse_host: "{{ langfuse_host }}"
+langfuse_port: 3000
+langfuse_public_key: "{{ lookup('env', 'LANGFUSE_PUBLIC_KEY') }}"
+langfuse_private_key: "{{ lookup('env', 'LANGFUSE_PRIVATE_KEY') }}"
+
+# Performance Settings
+max_concurrent_requests: 10
+chunk_size: 512
+cache_enabled: true
+cache_ttl: 3600
+# Monitoring
+metrics_enabled: true
+prometheus_port: "{{ prometheus_port }}"

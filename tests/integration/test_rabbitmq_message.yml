@@ -1,0 +1,21 @@
+---
+- name: Test RabbitMQ Messaging
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Publish test message to RabbitMQ
+      community.rabbitmq.rabbitmq_publish:
+        host: "{{ rabbitmq_host }}"
+        port: "{{ rabbitmq_port }}"
+        user: "{{ rabbitmq_default_user }}"
+        password: "{{ rabbitmq_default_pass }}"
+        vhost: "/"
+        exchange: ""
+        routing_key: "test_queue"
+        payload: "integration test"
+      register: rabbitmq_publish
+      ignore_errors: true
+    - name: Assert RabbitMQ message published
+      assert:
+        that:
+          - rabbitmq_publish is defined

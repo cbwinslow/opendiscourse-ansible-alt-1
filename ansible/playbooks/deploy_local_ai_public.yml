@@ -1,0 +1,33 @@
+---
+- name: Deploy Local AI Packaged Stack (Public)
+  hosts: local_ai_servers
+  become: true
+  vars:
+    start_services_script: "/home/{{ ansible_user }}/CascadeProjects/opendiscourse-ansible-alt/local-ai-packaged/start_services.py"
+    profile: "gpu-nvidia"  # Change to your hardware profile: gpu-nvidia, gpu-amd, cpu, none
+    environment: "public"
+  tasks:
+    - name: Ensure python3 is installed
+      apt:
+        name: python3
+        state: present
+        update_cache: yes
+
+    - name: Ensure pip is installed
+      apt:
+        name: python3-pip
+        state: present
+        update_cache: yes
+
+    - name: Run Local AI start_services.py script for public deployment
+      command: >
+        python3 {{ start_services_script }} --profile {{ profile }} --environment {{ environment }}
+      args:
+        chdir: "/home/{{ ansible_user }}/CascadeProjects/opendiscourse-ansible-alt/local-ai-packaged"
+      environment:
+        ENV_FILE: "/home/{{ ansible_user }}/CascadeProjects/opendiscourse-ansible-alt/local-ai-packaged/.env"
+      register: start_services_result
+
+    - name: Show output of Local AI deployment
+      debug:
+        var: start_services_result.stdout

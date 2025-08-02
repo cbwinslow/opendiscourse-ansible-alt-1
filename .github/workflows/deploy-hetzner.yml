@@ -1,0 +1,58 @@
+name: Deploy to Hetzner Docker
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Ansible and dependencies
+        run: |
+          pip install ansible ansible-lint
+          pip install community.postgresql
+          pip install community.rabbitmq
+
+      - name: Run integration tests
+        run: |
+          cd tests/integration
+          bash run_all_tests.sh
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "$HETZNER_RSA" > ~/.ssh/hetzner_rsa
+          chmod 600 ~/.ssh/hetzner_rsa
+        env:
+          HETZNER_RSA: ${{ secrets.HETZNER_RSA }}
+
+      - name: Add Hetzner to known_hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.HETZNER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy Docker container to Hetzner
+        run: |
+          scp -i ~/.ssh/hetzner_rsa -r docker/ ${{ secrets.HETZNER_USER }}@${{ secrets.HETZNER_HOST }}:/home/${{ secrets.HETZNER_USER }}/docker
+          ssh -i ~/.ssh/hetzner_rsa ${{ secrets.HETZNER_USER }}@${{ secrets.HETZNER_HOST }} "cd /home/${{ secrets.HETZNER_USER }}/docker && docker compose up -d --build"
+
+      - name: Verify deployment
+        run: |
+          ssh -i ~/.ssh/hetzner_rsa ${{ secrets.HETZNER_USER }}@${{ secrets.HETZNER_HOST }} "docker ps"

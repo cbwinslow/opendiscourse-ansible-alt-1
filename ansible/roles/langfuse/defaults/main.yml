@@ -1,0 +1,28 @@
+---
+# Langfuse Configuration
+langfuse_enabled: true
+langfuse_version: "latest"
+langfuse_port: 3000
+langfuse_host: "{{ langfuse_host }}"
+
+# Docker Configuration
+langfuse_container_name: "langfuse"
+langfuse_image: "langfuse/langfuse"
+langfuse_network: "opendiscourse_network"
+
+# Database Configuration
+langfuse_postgres_host: "{{ postgres_host }}"
+langfuse_postgres_port: "{{ postgres_port }}"
+langfuse_postgres_db: "{{ postgres_db }}"
+langfuse_postgres_user: "{{ postgres_admin_user }}"
+langfuse_postgres_password: "{{ postgres_admin_password }}"
+
+# Authentication
+langfuse_auth_secret: "your-secret-key"
+langfuse_public_key: "your-public-key"
+langfuse_private_key: "your-private-key"
+
+# Integration Points
+langfuse_fastapi_integration: true
+langfuse_agentic_rag_integration: true
+langfuse_local_ai_integration: true

@@ -50,10 +50,14 @@ else
 fi
 
 # 6. Optionally disable UFW for testing
-read -p "Do you want to temporarily disable UFW to test connectivity? (y/N): " DISABLE_UFW
-if [[ "$DISABLE_UFW" =~ ^[Yy]$ ]]; then
-    sudo ufw disable
-    echo "UFW disabled. Test your services, then re-enable with 'sudo ufw enable'."
+if [ -t 0 ]; then
+    read -p "Do you want to temporarily disable UFW to test connectivity? (y/N): " DISABLE_UFW
+    if [[ "$DISABLE_UFW" =~ ^[Yy]$ ]]; then
+        sudo ufw disable
+        echo "UFW disabled. Test your services, then re-enable with 'sudo ufw enable'."
+    fi
+else
+    echo "Skipping UFW disable (non-interactive mode)"
 fi
 
 echo "Network fix script complete. Please check your services and DNS resolution."

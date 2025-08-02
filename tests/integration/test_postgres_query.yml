@@ -1,0 +1,20 @@
+---
+- name: Test PostgreSQL Query
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Run simple query on PostgreSQL
+      community.postgresql.postgresql_query:
+        db: "{{ postgres_db }}"
+        login_host: "{{ postgres_host }}"
+        login_port: "{{ postgres_port }}"
+        login_user: "{{ postgres_admin_user }}"
+        login_password: "{{ postgres_admin_password }}"
+        query: "SELECT 1;"
+      register: pg_query
+      ignore_errors: true
+    - name: Assert PostgreSQL query returns 1
+      assert:
+        that:
+          - pg_query.query_result[0][0] == 1
+      when: pg_query is defined

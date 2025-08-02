@@ -2,6 +2,18 @@
 # dummy_web_servers.sh
 # Starts dummy HTTP and HTTPS servers on ports 80 and 443 to suppress connection errors
 
+# Function to stop servers
+stop_servers() {
+  echo "Stopping dummy servers..."
+  pkill -f "python3 -m http.server 80" || true
+  pkill -f "python3 -c.*http.server.*443" || true
+  echo "Dummy servers stopped."
+  exit 0
+}
+
+# Trap Ctrl+C to stop servers gracefully
+trap stop_servers INT TERM
+
 set -e
 
 # Check for root privileges
@@ -26,3 +38,9 @@ nohup python3 -c "import http.server, ssl; server = http.server.HTTPServer(('127
 echo "Started dummy HTTPS server on port 443 (PID $!)"
 
 echo "Dummy servers running. Errors from localhost:80/443 should now be suppressed."
+echo "Press Ctrl+C to stop servers."
+
+# Wait indefinitely
+while true; do
+  sleep 60
+done

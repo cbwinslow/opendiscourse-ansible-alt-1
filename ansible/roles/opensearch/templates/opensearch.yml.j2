@@ -1,0 +1,8 @@
+cluster.name: {{ opensearch_cluster_name }}
+node.name: {{ opensearch_node_name }}
+path.data: {{ opensearch_data_dir }}
+path.logs: /opt/opensearch/logs
+network.host: 0.0.0.0
+http.port: {{ opensearch_port }}
+discovery.type: single-node
+plugins.security.disabled: true

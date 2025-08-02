@@ -1,0 +1,95 @@
+---
+# Install system dependencies
+- name: Install system packages
+  apt:
+    name: "{{ fastapi_system_packages }}"
+    state: present
+    update_cache: yes
+  become: true
+
+# Create user and group
+- name: Create FastAPI group
+  group:
+    name: "{{ fastapi_group }}"
+    state: present
+  become: true
+
+- name: Create FastAPI user
+  user:
+    name: "{{ fastapi_user }}"
+    group: "{{ fastapi_group }}"
+    home: "{{ fastapi_home }}"
+    shell: /bin/bash
+    system: yes
+  become: true
+
+# Setup application directory
+- name: Create application directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ fastapi_user }}"
+    group: "{{ fastapi_group }}"
+    mode: '0755'
+  loop:
+    - "{{ fastapi_home }}"
+    - "{{ fastapi_app_dir }}"
+    - "{{ fastapi_home }}/logs"
+  become: true
+
+# Setup Python virtual environment
+- name: Create Python virtual environment
+  command:
+    cmd: "python3 -m venv {{ fastapi_venv_path }}"
+    creates: "{{ fastapi_venv_path }}"
+  become: yes
+  become_user: "{{ fastapi_user }}"
+
+# Install Python dependencies
+- name: Install Python packages
+  pip:
+    name: 
+      - fastapi
+      - uvicorn[standard]
+      - sqlalchemy
+      - psycopg2-binary
+      - python-jose[cryptography]
+      - passlib[bcrypt]
+      - python-multipart
+      - httpx
+    virtualenv: "{{ fastapi_venv_path }}"
+    state: present
+  become: yes
+  become_user: "{{ fastapi_user }}"
+
+# Deploy application
+- name: Clone/update application repository
+  git:
+    repo: "{{ fastapi_repo_url }}"
+    dest: "{{ fastapi_app_dir }}"
+    version: "{{ fastapi_repo_version }}"
+    force: yes
+  become: yes
+  become_user: "{{ fastapi_user }}"
+  notify: restart fastapi
+
+# Configure systemd service
+- name: Install systemd service file
+  template:
+    src: fastapi.service.j2
+    dest: "/etc/systemd/system/{{ fastapi_service_name }}.service"
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - reload systemd
+    - restart fastapi
+  become: true
+
+# Ensure service is running
+- name: Ensure FastAPI service is running and enabled
+  systemd:
+    name: "{{ fastapi_service_name }}"
+    state: started
+    enabled: "{{ fastapi_service_enabled }}"
+  become: true

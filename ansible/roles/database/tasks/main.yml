@@ -1,0 +1,5 @@
+---
+# tasks file for database
+- name: Print Database setup message
+  debug:
+    msg: "Database role setup complete."

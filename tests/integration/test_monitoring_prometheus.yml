@@ -1,0 +1,17 @@
+---
+- name: Test Prometheus Metrics Scrape
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Scrape Prometheus metrics endpoint
+      uri:
+        url: "http://{{ prometheus_host }}:{{ prometheus_port }}/metrics"
+        method: GET
+        status_code: 200
+      register: prometheus_metrics
+      ignore_errors: true
+    - name: Assert Prometheus metrics endpoint returns 200
+      assert:
+        that:
+          - prometheus_metrics.status == 200
+      when: prometheus_metrics is defined

@@ -7,9 +7,9 @@ rabbitmq_service_state: started
 rabbitmq_service_enabled: true
 
 # Network Configuration
-rabbitmq_tcp_port: 5672
-rabbitmq_management_port: 15672
-rabbitmq_management_bind_ip: '0.0.0.0'
+rabbitmq_tcp_port: "{{ rabbitmq_port }}"
+rabbitmq_management_port: "{{ rabbitmq_management_port }}"
+rabbitmq_management_bind_ip: "{{ rabbitmq_host }}"
 rabbitmq_management_path: /api
 rabbitmq_management_ssl: false
 
@@ -23,8 +23,8 @@ rabbitmq_ssl_verify: verify_peer
 rabbitmq_ssl_fail_if_no_peer_cert: true
 
 # Authentication
-rabbitmq_default_user: guest
-rabbitmq_default_pass: guest
+rabbitmq_default_user: "{{ rabbitmq_default_user }}"
+rabbitmq_default_pass: "{{ rabbitmq_default_pass }}"
 rabbitmq_default_vhost: /
 rabbitmq_allow_guest: false
 

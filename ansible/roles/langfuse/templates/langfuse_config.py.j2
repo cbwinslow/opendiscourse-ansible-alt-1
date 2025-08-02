@@ -1,0 +1,25 @@
+"""Langfuse configuration for observability."""
+
+LANGFUSE_PUBLIC_KEY = "{{ langfuse_public_key }}"
+LANGFUSE_PRIVATE_KEY = "{{ langfuse_private_key }}"
+LANGFUSE_HOST = "http://{{ langfuse_host }}:{{ langfuse_port }}"
+
+# Tracing configuration
+ENABLE_TRACING = True
+TRACE_LEVEL = "DEBUG"
+
+# Metrics configuration
+ENABLE_METRICS = True
+METRICS_INTERVAL = 60  # seconds
+
+# Integration specific settings
+{% if langfuse_fastapi_integration | bool %}
+FASTAPI_TRACE_ALL_REQUESTS = True
+FASTAPI_TRACE_ERRORS = True
+{% endif %}
+
+{% if langfuse_agentic_rag_integration | bool %}
+RAG_TRACE_RETRIEVALS = True
+RAG_TRACE_GENERATIONS = True
+RAG_TRACE_EMBEDDINGS = True
+{% endif %}

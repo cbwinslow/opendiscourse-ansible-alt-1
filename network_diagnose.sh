@@ -41,7 +41,11 @@ ss -tulnp
 
 # System logs for network changes
 echo -e "\n--- Recent Network-Related System Logs ---"
-journalctl -u NetworkManager -u docker -u systemd-networkd --since "1 hour ago" | tail -n 100
+if command -v journalctl >/dev/null 2>&1; then
+  journalctl -u NetworkManager -u docker -u systemd-networkd --since "1 hour ago" | tail -n 100
+else
+  echo "journalctl command not available"
+fi
 
 # Check for network changes in dmesg
 echo -e "\n--- dmesg Network Events ---"

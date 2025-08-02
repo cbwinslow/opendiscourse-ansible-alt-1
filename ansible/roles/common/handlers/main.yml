@@ -1,0 +1,9 @@
+---
+- name: restart ssh
+  systemd:
+    name: ssh
+    state: restarted
+- name: restart ufw
+  systemd:
+    name: ufw
+    state: restarted

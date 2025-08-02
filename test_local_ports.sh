@@ -5,12 +5,24 @@
 set -e
 
 echo "==== Checking if anything is listening on ports 80 and 443 ===="
-ss -tuln | grep -E ':80 |:443 ' || echo "No listeners found on 80/443 with ss."
-netstat -tuln | grep -E ':80 |:443 ' || echo "No listeners found on 80/443 with netstat."
+if command -v ss >/dev/null 2>&1; then
+  ss -tuln | grep -E ':80 |:443 ' || echo "No listeners found on 80/443 with ss."
+else
+  echo "ss command not available"
+fi
+if command -v netstat >/dev/null 2>&1; then
+  netstat -tuln | grep -E ':80 |:443 ' || echo "No listeners found on 80/443 with netstat."
+else
+  echo "netstat command not available"
+fi
 
 echo "\n==== Testing HTTP/HTTPS connectivity to localhost ===="
-curl -I http://localhost:80 || echo "Could not connect to localhost:80"
-curl -I https://localhost:443 || echo "Could not connect to localhost:443"
+if command -v curl >/dev/null 2>&1; then
+  curl -I http://localhost:80 || echo "Could not connect to localhost:80"
+  curl -I https://localhost:443 || echo "Could not connect to localhost:443"
+else
+  echo "curl command not available"
+fi
 
 echo "\n==== Listing running Docker containers and their port mappings ===="
 docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'

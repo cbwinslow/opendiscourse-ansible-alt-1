@@ -1,0 +1,19 @@
+---
+- name: restart langfuse
+  docker_compose:
+    project_src: "/opt/langfuse"
+    state: present
+    restarted: true
+  become: true
+
+- name: restart fastapi
+  systemd:
+    name: "{{ fastapi_service_name }}"
+    state: restarted
+  when: langfuse_fastapi_integration | bool
+
+- name: restart agentic-rag
+  systemd:
+    name: "agentic-rag"
+    state: restarted
+  when: langfuse_agentic_rag_integration | bool

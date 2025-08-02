@@ -2,6 +2,9 @@
 # monitor_network_changes.sh
 # Monitors network interfaces and routes for changes that may interrupt VS Code/Copilot
 
+# Trap Ctrl+C to exit gracefully
+trap 'echo -e "\nMonitoring stopped."; exit 0' INT
+
 LOGFILE="/tmp/network_changes.log"
 
 prev_ifconfig=""

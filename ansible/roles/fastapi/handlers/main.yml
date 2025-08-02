@@ -1,0 +1,17 @@
+---
+- name: restart fastapi
+  systemd:
+    name: "{{ fastapi_service_name }}"
+    state: restarted
+    daemon_reload: yes
+  when: fastapi_restart_on_change | bool
+
+- name: reload fastapi
+  systemd:
+    name: "{{ fastapi_service_name }}"
+    state: reloaded
+  when: fastapi_service_enabled | bool
+
+- name: reload systemd
+  systemd:
+    daemon_reload: yes

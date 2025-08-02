@@ -1,0 +1,14 @@
+---
+- name: Test Security Firewall Rules
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Check UFW status
+      command: ufw status
+      register: ufw_status
+      ignore_errors: true
+    - name: Assert UFW is active
+      assert:
+        that:
+          - "'Status: active' in ufw_status.stdout"
+      when: ufw_status is defined

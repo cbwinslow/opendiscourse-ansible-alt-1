@@ -1,0 +1,11 @@
+---
+docker_users:
+  - deploy
+  - admin
+docker_version: "latest"
+docker_compose_version: "v2.20.0"
+docker_storage_driver: "overlay2"
+docker_log_driver: "json-file"
+docker_log_opts: {}
+docker_host: "{{ docker_host }}"
+docker_port: "{{ docker_port }}"

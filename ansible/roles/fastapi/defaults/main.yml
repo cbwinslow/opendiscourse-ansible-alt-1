@@ -1,0 +1,39 @@
+---
+# FastAPI Application Settings
+fastapi_app_name: "opendiscourse-api"
+fastapi_user: "fastapi"
+fastapi_group: "fastapi"
+fastapi_home: "/opt/fastapi"
+fastapi_port: 8000
+fastapi_host: "0.0.0.0"
+fastapi_workers: 4
+fastapi_log_level: "info"
+
+# Virtual Environment
+fastapi_venv_path: "{{ fastapi_home }}/venv"
+fastapi_requirements_file: "{{ fastapi_home }}/requirements.txt"
+
+# Application Source
+fastapi_repo_url: "https://github.com/foomanchu8008/opendiscourse-api.git"
+fastapi_repo_version: "main"
+fastapi_app_dir: "{{ fastapi_home }}/app"
+
+# Service Configuration
+fastapi_service_name: "{{ fastapi_app_name }}"
+fastapi_service_enabled: true
+fastapi_restart_on_change: true
+
+# Dependencies
+fastapi_system_packages:
+  - python3-pip
+  - python3-venv
+  - git
+
+# Environment Variables
+fastapi_env_vars:
+  PYTHONPATH: "{{ fastapi_app_dir }}"
+  LOG_LEVEL: "{{ fastapi_log_level }}"
+  PORT: "{{ fastapi_port }}"
+  AGENTIC_RAG_URL: "http://localhost:8001"
+  DATABASE_URL: "postgresql://{{ postgres_admin_user }}:{{ postgres_admin_password }}@{{ postgres_host }}:{{ postgres_port }}/{{ postgres_db }}"
+  VECTOR_STORE_URL: "http://{{ localai_host }}:{{ localai_port }}"

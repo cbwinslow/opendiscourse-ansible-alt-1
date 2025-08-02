@@ -1,0 +1,92 @@
+---
+# Install dependencies
+- name: Install required packages
+  apt:
+    name:
+      - openjdk-11-jre-headless
+      - wget
+      - curl
+      - unzip
+    state: present
+    update_cache: yes
+  become: true
+
+# Create directories
+- name: Create data and config directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ opensearch_data_dir }}"
+    - "{{ opensearch_config_dir }}"
+  become: true
+
+# Download and install OpenSearch
+- name: Download OpenSearch
+  get_url:
+    url: "https://artifacts.opensearch.org/releases/bundle/opensearch/{{ opensearch_version }}/opensearch-{{ opensearch_version }}-linux-x64.tar.gz"
+    dest: "/tmp/opensearch.tar.gz"
+  become: true
+
+- name: Extract OpenSearch
+  unarchive:
+    src: "/tmp/opensearch.tar.gz"
+    dest: "/opt/"
+    remote_src: yes
+  become: true
+
+# Configure OpenSearch
+- name: Deploy OpenSearch config
+  template:
+    src: opensearch.yml.j2
+    dest: "{{ opensearch_config_dir }}/opensearch.yml"
+    mode: '0644'
+  notify: restart opensearch
+  become: true
+
+# Download and install OpenSearch Dashboards
+- name: Download OpenSearch Dashboards
+  get_url:
+    url: "https://artifacts.opensearch.org/releases/bundle/opensearch-dashboards/{{ opensearch_version }}/opensearch-dashboards-{{ opensearch_version }}-linux-x64.tar.gz"
+    dest: "/tmp/opensearch-dashboards.tar.gz"
+  when: opensearch_dashboards_enabled | bool
+  become: true
+
+- name: Extract OpenSearch Dashboards
+  unarchive:
+    src: "/tmp/opensearch-dashboards.tar.gz"
+    dest: "/opt/"
+    remote_src: yes
+  when: opensearch_dashboards_enabled | bool
+  become: true
+
+# Configure OpenSearch Dashboards
+- name: Deploy Dashboards config
+  template:
+    src: dashboards.yml.j2
+    dest: "{{ opensearch_config_dir }}/dashboards.yml"
+    mode: '0644'
+  notify: restart opensearch-dashboards
+  when: opensearch_dashboards_enabled | bool
+  become: true
+
+# Integrate with monitoring
+- name: Configure Prometheus exporter
+  template:
+    src: prometheus.yml.j2
+    dest: "{{ opensearch_config_dir }}/prometheus.yml"
+    mode: '0644'
+  when: prometheus_enabled | bool
+  become: true
+
+# Health check
+- name: Wait for OpenSearch to be ready
+  uri:
+    url: "http://localhost:{{ opensearch_port }}"
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 60
+  delay: 2
+  become: true

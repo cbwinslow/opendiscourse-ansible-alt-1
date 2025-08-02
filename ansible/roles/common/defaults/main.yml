@@ -1,0 +1,10 @@
+---
+timezone: "America/New_York"
+ntp_servers:
+  - "pool.ntp.org"
+ssh_port: 2222
+ssh_password_authentication: false
+ssh_root_login: false
+ufw_default_deny_policy: "deny"
+ufw_rules: []
+admin_users: []

@@ -1,0 +1,47 @@
+---
+- name: Configure Cloudflare DNS via API
+  hosts: hetzner_server
+  become: false
+  connection: local
+  gather_facts: false
+  vars_files:
+    - ../group_vars/all/secrets.yml
+  vars:
+    domain_name: opendiscourse.net
+    public_ip: 95.217.106.176
+
+  tasks:
+    - name: Build DNS records list with resolved public_ip
+      set_fact:
+        cloudflare_dns_records:
+          - { type: "A", name: "n8n", content: "{{ public_ip }}", proxied: true }
+          - { type: "A", name: "openwebui", content: "{{ public_ip }}", proxied: true }
+          - { type: "A", name: "flowise", content: "{{ public_ip }}", proxied: true }
+          - { type: "A", name: "supabase", content: "{{ public_ip }}", proxied: true }
+          - { type: "A", name: "langfuse", content: "{{ public_ip }}", proxied: true }
+          - { type: "A", name: "ollama", content: "{{ public_ip }}", proxied: true }
+          - { type: "A", name: "searxng", content: "{{ public_ip }}", proxied: true }
+          - { type: "A", name: "neo4j", content: "{{ public_ip }}", proxied: true }
+
+    - name: Create/update DNS records in Cloudflare
+      uri:
+        url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare_zone_id }}/dns_records"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ cloudflare_api_token }}"
+          Content-Type: "application/json"
+        body_format: json
+        body:
+          type: "{{ item.type }}"
+          name: "{{ item.name }}.{{ domain_name }}"
+          content: "{{ item.content }}"
+          proxied: "{{ item.proxied }}"
+        status_code: 200
+      loop: "{{ cloudflare_dns_records }}"
+      loop_control:
+        label: "{{ item.name }}"
+      register: cloudflare_dns_result
+
+    - name: Show Cloudflare DNS API result
+      debug:
+        var: cloudflare_dns_result

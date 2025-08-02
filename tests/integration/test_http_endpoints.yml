@@ -1,0 +1,109 @@
+---
+- name: Test HTTP Endpoints for Core Services
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Check FastAPI health endpoint
+      uri:
+        url: "http://{{ fastapi_host }}:{{ fastapi_port }}/health"
+        method: GET
+        status_code: 200
+      register: fastapi_health
+      ignore_errors: true
+    - name: Assert FastAPI health endpoint is OK
+      assert:
+        that:
+          - fastapi_health.status == 200
+      when: fastapi_health is defined
+
+    - name: Check LocalAI health endpoint
+      uri:
+        url: "http://{{ localai_host }}:{{ localai_port }}/health"
+        method: GET
+        status_code: 200
+      register: localai_health
+      ignore_errors: true
+    - name: Assert LocalAI health endpoint is OK
+      assert:
+        that:
+          - localai_health.status == 200
+      when: localai_health is defined
+
+    - name: Check Langfuse health endpoint
+      uri:
+        url: "http://{{ langfuse_host }}:{{ langfuse_port }}/api/health"
+        method: GET
+        status_code: 200
+      register: langfuse_health
+      ignore_errors: true
+    - name: Assert Langfuse health endpoint is OK
+      assert:
+        that:
+          - langfuse_health.status == 200
+      when: langfuse_health is defined
+
+    - name: Check Opensearch health endpoint
+      uri:
+        url: "http://{{ opensearch_host }}:{{ opensearch_port }}/_cluster/health"
+        method: GET
+        status_code: 200
+      register: opensearch_health
+      ignore_errors: true
+    - name: Assert Opensearch health endpoint is OK
+      assert:
+        that:
+          - opensearch_health.status == 200
+      when: opensearch_health is defined
+
+    - name: Check Caddy root endpoint
+      uri:
+        url: "http://{{ caddy_host }}:{{ caddy_port }}/"
+        method: GET
+        status_code: 200
+      register: caddy_root
+      ignore_errors: true
+    - name: Assert Caddy root endpoint is OK
+      assert:
+        that:
+          - caddy_root.status == 200
+      when: caddy_root is defined
+
+    - name: Check Grafana login page
+      uri:
+        url: "http://{{ grafana_host }}:{{ grafana_port }}/login"
+        method: GET
+        status_code: 200
+      register: grafana_login
+      ignore_errors: true
+    - name: Assert Grafana login page is OK
+      assert:
+        that:
+          - grafana_login.status == 200
+      when: grafana_login is defined
+
+    - name: Check Prometheus root endpoint
+      uri:
+        url: "http://{{ prometheus_host }}:{{ prometheus_port }}/"
+        method: GET
+        status_code: 200
+      register: prometheus_root
+      ignore_errors: true
+    - name: Assert Prometheus root endpoint is OK
+      assert:
+        that:
+          - prometheus_root.status == 200
+      when: prometheus_root is defined
+
+    - name: Check Flowise health endpoint
+      uri:
+        url: "http://{{ flowise_host }}:{{ flowise_port }}/health"
+        method: GET
+        status_code: 200
+      register: flowise_health
+      ignore_errors: true
+    - name: Assert Flowise health endpoint is OK
+      assert:
+        that:
+          - flowise_health.status == 200
+      when: flowise_health is defined
+

@@ -1,0 +1,20 @@
+---
+- name: Test LocalAI to Langfuse Integration
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Call LocalAI endpoint that logs to Langfuse
+      uri:
+        url: "http://{{ localai_host }}:{{ localai_port }}/v1/log-to-langfuse"
+        method: POST
+        status_code: 200
+        body_format: json
+        body:
+          message: "integration test"
+      register: localai_langfuse
+      ignore_errors: true
+    - name: Assert LocalAI to Langfuse integration returns 200
+      assert:
+        that:
+          - localai_langfuse.status == 200
+      when: localai_langfuse is defined

@@ -63,12 +63,6 @@
     state: enabled
   tags: [security, firewall]
 
-- name: Ensure fail2ban is installed
-  apt:
-    name: fail2ban
-    state: present
-  tags: [security, fail2ban]
-
 - name: Configure fail2ban
   template:
     src: jail.local.j2
@@ -147,25 +141,6 @@
     mode: '0644'
   notify: restart suricata
 
-- name: Install and configure fail2ban
-  block:
-    - name: Install fail2ban
-      apt:
-        name: fail2ban
-        state: present
-
-    - name: Configure fail2ban
-      template:
-        src: jail.local.j2
-        dest: /etc/fail2ban/jail.local
-        mode: '0644'
-
-    - name: Enable and start fail2ban
-      systemd:
-        name: fail2ban
-        enabled: yes
-        state: started
-
 - name: Configure UFW with custom rules
   block:
     - name: Allow Cloudflare IPs
@@ -226,7 +201,7 @@
       lineinfile:
         path: /etc/ssh/sshd_config
         regexp: '^Port'
-        line: 'Port {{ ssh_port }}'
+        line: 'Port {{ security_hardening.ssh.port }}'
 
     - name: Allow only specific users
       lineinfile:
@@ -359,4 +334,19 @@ handlers:
   - name: restart suricata
     systemd:
       name: suricata
+      state: restarted
+
+  - name: restart sshd
+    systemd:
+      name: sshd
+      state: restarted
+
+  - name: restart fail2ban
+    systemd:
+      name: fail2ban
+      state: restarted
+
+  - name: restart auditd
+    systemd:
+      name: auditd
       state: restarted

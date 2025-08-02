@@ -14,6 +14,7 @@ fail2ban:
 
 # System hardening configurations
 security_hardening:
+  ufw_allowed_ports: "{{ ufw_allowed_ports }}"
   # SSH hardening
   ssh:
     port: 2222
@@ -47,12 +48,6 @@ security_hardening:
   sysctl:
     net.ipv4.tcp_syncookies: 1
     net.ipv4.ip_forward: 0
-    net.ipv4.conf.all.send_redirects: 0
-    net.ipv4.conf.default.send_redirects: 0
-    net.ipv4.conf.all.accept_redirects: 0
-    net.ipv4.conf.default.accept_redirects: 0
-    net.ipv4.conf.all.secure_redirects: 0
-    net.ipv4.conf.default.secure_redirects: 0
     net.ipv4.icmp_echo_ignore_broadcasts: 1
     net.ipv4.icmp_ignore_bogus_error_responses: 1
     net.ipv4.conf.all.rp_filter: 1
@@ -63,32 +58,12 @@ security_hardening:
     net.ipv4.conf.default.accept_source_route: 0
     net.ipv6.conf.all.accept_source_route: 0
     net.ipv6.conf.default.accept_source_route: 0
-    net.ipv4.conf.all.send_redirects: 0
-    net.ipv4.conf.default.send_redirects: 0
-    net.ipv4.conf.all.accept_redirects: 0
-    net.ipv4.conf.default.accept_redirects: 0
     net.ipv6.conf.all.accept_redirects: 0
     net.ipv6.conf.default.accept_redirects: 0
-    net.ipv4.conf.all.secure_redirects: 0
-    net.ipv4.conf.default.secure_redirects: 0
-
-# Fail2ban configuration
-fail2ban:
-  enabled: true
-  ignoreip: 127.0.0.1/8 ::1
-  bantime: 3600
-  findtime: 600
-  maxretry: 5
-  destemail: root@localhost
-  action: %(action_mwl)s
-  jails:
-    - ssh
-    - ssh-ddos
-    - recidive
 
 # Automatic security updates
 security_updates:
-  enabled: true
+  enabled: "{{ security_updates_enabled }}"
   unattended_upgrades: true
   auto_reboot: false
   auto_reboot_time: '03:00'
@@ -119,7 +94,6 @@ auditd:
   num_logs: 5
   priority_boost: 4
   name_format: 'hostname'
-  max_log_file_action: 'keep_logs'
   log_group: 'root'
 
 # Common security packages to install
@@ -134,8 +108,7 @@ security_packages:
   - ssl-cert
   - unattended-upgrades
   - apt-listchanges
-  - debsum
-  - debsums-apt
+  - debsums
   - needrestart
   - logwatch
   - logcheck
@@ -156,9 +129,5 @@ security_packages:
   - policycoreutils
   - setools
   - setroubleshoot
-  - auditd
   - audispd-plugins
-  - acct
-  - acct
-  - acct
   - acct
