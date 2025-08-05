@@ -1,5 +1,222 @@
 ---
-# tasks file for database
-- name: Print Database setup message
+# Database Management Role
+# This role manages all database services for the OpenDiscourse infrastructure
+
+- name: Include OS-specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_distribution | lower }}.yml"
+    - "{{ ansible_os_family | lower }}.yml"
+  tags: [database, config]
+
+# PostgreSQL Setup
+- name: Install PostgreSQL
+  apt:
+    name:
+      - "postgresql-{{ postgresql_version }}"
+      - "postgresql-client-{{ postgresql_version }}"
+      - "postgresql-contrib-{{ postgresql_version }}"
+      - python3-psycopg2
+    state: present
+    update_cache: yes
+  when: postgresql_enabled | bool
+  tags: [database, postgresql, install]
+
+- name: Ensure PostgreSQL service is running
+  systemd:
+    name: postgresql
+    state: started
+    enabled: yes
+  when: postgresql_enabled | bool
+  tags: [database, postgresql, service]
+
+- name: Create PostgreSQL databases
+  postgresql_db:
+    name: "{{ item.name }}"
+    encoding: "{{ item.encoding | default('UTF8') }}"
+    state: present
+  loop: "{{ postgresql_databases | default([]) }}"
+  become: true
+  become_user: postgres
+  when: postgresql_enabled | bool and postgresql_databases is defined
+  tags: [database, postgresql, config]
+
+- name: Create PostgreSQL users
+  postgresql_user:
+    name: "{{ item.name }}"
+    password: "{{ item.password }}"
+    state: present
+  loop: "{{ postgresql_users | default([]) }}"
+  become: true
+  become_user: postgres
+  no_log: true
+  when: postgresql_enabled | bool and postgresql_users is defined
+  tags: [database, postgresql, config]
+
+- name: Configure PostgreSQL settings
+  lineinfile:
+    path: "/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"
+    regexp: "^#?{{ item.key }}.*"
+    line: "{{ item.key }} = {{ item.value }}"
+    backup: yes
+  loop: "{{ postgresql_config | default([]) }}"
+  notify: restart postgresql
+  when: postgresql_enabled | bool and postgresql_config is defined
+  tags: [database, postgresql, config]
+
+# Neo4j Setup
+- name: Install Neo4j dependencies
+  apt:
+    name:
+      - openjdk-11-jre-headless
+      - wget
+    state: present
+  when: neo4j_enabled | bool
+  tags: [database, neo4j, install]
+
+- name: Download and install Neo4j
+  unarchive:
+    src: "https://neo4j.com/artifact.php?name=neo4j-community-{{ neo4j_version }}-unix.tar.gz"
+    dest: /opt/
+    remote_src: yes
+    creates: "/opt/neo4j-community-{{ neo4j_version }}"
+  when: neo4j_enabled | bool
+  tags: [database, neo4j, install]
+
+- name: Create Neo4j symlink
+  file:
+    src: "/opt/neo4j-community-{{ neo4j_version }}"
+    dest: /opt/neo4j
+    state: link
+  when: neo4j_enabled | bool
+  tags: [database, neo4j, install]
+
+- name: Configure Neo4j
+  template:
+    src: neo4j.conf.j2
+    dest: /opt/neo4j/conf/neo4j.conf
+    mode: '0644'
+  notify: restart neo4j
+  when: neo4j_enabled | bool
+  tags: [database, neo4j, config]
+
+- name: Ensure Neo4j service is running
+  systemd:
+    name: neo4j
+    state: started
+    enabled: yes
+  when: neo4j_enabled | bool
+  tags: [database, neo4j, service]
+
+# OpenSearch Setup
+- name: Install OpenSearch dependencies
+  apt:
+    name:
+      - openjdk-11-jre-headless
+      - wget
+    state: present
+  when: opensearch_enabled | bool
+  tags: [database, opensearch, install]
+
+- name: Download and install OpenSearch
+  unarchive:
+    src: "https://artifacts.opensearch.org/releases/bundle/opensearch/{{ opensearch_version }}/opensearch-{{ opensearch_version }}-linux-x64.tar.gz"
+    dest: /opt/
+    remote_src: yes
+    creates: "/opt/opensearch-{{ opensearch_version }}"
+  when: opensearch_enabled | bool
+  tags: [database, opensearch, install]
+
+- name: Create OpenSearch symlink
+  file:
+    src: "/opt/opensearch-{{ opensearch_version }}"
+    dest: /opt/opensearch
+    state: link
+  when: opensearch_enabled | bool
+  tags: [database, opensearch, install]
+
+- name: Configure OpenSearch
+  template:
+    src: opensearch.yml.j2
+    dest: /opt/opensearch/config/opensearch.yml
+    mode: '0644'
+  notify: restart opensearch
+  when: opensearch_enabled | bool
+  tags: [database, opensearch, config]
+
+- name: Ensure OpenSearch service is running
+  systemd:
+    name: opensearch
+    state: started
+    enabled: yes
+  when: opensearch_enabled | bool
+  tags: [database, opensearch, service]
+
+# Database Security Hardening
+- name: Set up database firewall rules
+  ufw:
+    rule: allow
+    port: "{{ item.port }}"
+    proto: tcp
+  loop:
+    - { port: "{{ postgresql_port | default(5432) }}" }
+    - { port: "{{ neo4j_bolt_port | default(7687) }}" }
+    - { port: "{{ neo4j_http_port | default(7474) }}" }
+    - { port: "{{ opensearch_port | default(9200) }}" }
+  when: security_updates_enabled | bool
+  tags: [database, security, firewall]
+
+- name: Create database backup directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - /opt/database/backups
+    - /opt/database/logs
+    - /opt/database/monitoring
+  tags: [database, backup, config]
+
+- name: Install database monitoring tools
+  apt:
+    name:
+      - sysstat
+      - iotop
+      - htop
+    state: present
+  tags: [database, monitoring, install]
+
+- name: Set up database monitoring script
+  template:
+    src: database_monitor.sh.j2
+    dest: /opt/database/monitoring/database_monitor.sh
+    mode: '0755'
+  tags: [database, monitoring, config]
+
+- name: Schedule database monitoring
+  cron:
+    name: "Database Monitoring"
+    minute: "*/5"
+    job: "/opt/database/monitoring/database_monitor.sh"
+  tags: [database, monitoring, config]
+
+- name: Set up database backup script
+  template:
+    src: database_backup.sh.j2
+    dest: /opt/database/backups/database_backup.sh
+    mode: '0755'
+  tags: [database, backup, config]
+
+- name: Schedule database backups
+  cron:
+    name: "Database Backup"
+    minute: "0"
+    hour: "2"
+    job: "/opt/database/backups/database_backup.sh"
+  tags: [database, backup, config]
+
+- name: Database setup complete
   debug:
-    msg: "Database role setup complete."
+    msg: "Database role setup completed successfully"
+  tags: [database, always]

@@ -1,7 +1,63 @@
 ---
+# Database Role Defaults
+# This file contains default configuration for all database services
+
+# PostgreSQL Configuration
 postgresql_enabled: true
 postgresql_version: "15"
+postgresql_port: "{{ postgres_port | default(5432) }}"
+postgresql_data_dir: "/var/lib/postgresql/{{ postgresql_version }}/main"
+postgresql_config:
+  - { key: "max_connections", value: "100" }
+  - { key: "shared_buffers", value: "128MB" }
+  - { key: "effective_cache_size", value: "4GB" }
+  - { key: "maintenance_work_mem", value: "64MB" }
+  - { key: "checkpoint_completion_target", value: "0.9" }
+  - { key: "wal_buffers", value: "16MB" }
+  - { key: "default_statistics_target", value: "100" }
+  - { key: "random_page_cost", value: "1.1" }
+  - { key: "effective_io_concurrency", value: "200" }
+  - { key: "work_mem", value: "4MB" }
+  - { key: "min_wal_size", value: "1GB" }
+  - { key: "max_wal_size", value: "4GB" }
+
+postgresql_databases: []
+# Example:
+#  - name: "opendiscourse"
+#    encoding: "UTF8"
+
+postgresql_users: []
+# Example:
+#  - name: "app_user"
+#    password: "{{ vault_postgres_password }}"
+
+# Neo4j Configuration
 neo4j_enabled: true
 neo4j_version: "5.12"
+neo4j_port: "{{ neo4j_bolt_port | default(7687) }}"
+neo4j_http_port: "{{ neo4j_http_port | default(7474) }}"
+neo4j_https_port: 7473
+neo4j_data_dir: "/var/lib/neo4j/data"
+neo4j_memory_heap_initial_size: "512m"
+neo4j_memory_heap_max_size: "2G"
+neo4j_memory_pagecache_size: "1G"
+
+# OpenSearch Configuration
 opensearch_enabled: true
 opensearch_version: "2.12"
+opensearch_port: "{{ opensearch_port | default(9200) }}"
+opensearch_data_dir: "/var/lib/opensearch"
+opensearch_cluster_name: "opendiscourse-cluster"
+opensearch_node_name: "opendiscourse-node-1"
+opensearch_network_host: "0.0.0.0"
+opensearch_discovery_type: "single-node"
+
+# Database Security
+database_backup_enabled: true
+database_backup_retention_days: 30
+database_monitoring_enabled: true
+database_monitoring_interval: "5"
+
+# Database Integration
+database_integration_with_monitoring: true
+database_integration_with_agents: true

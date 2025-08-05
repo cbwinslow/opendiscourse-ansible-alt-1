@@ -1,0 +1,183 @@
+#!/bin/bash
+# Database Monitoring Script
+# This script monitors database health and performance
+
+set -e
+
+# Configuration
+LOG_FILE="/var/log/database/monitor.log"
+ALERT_FILE="/var/log/database/alerts.log"
+MAX_DISK_USAGE={{ database_max_disk_usage | default(80) }}
+MAX_MEMORY_USAGE={{ database_max_memory_usage | default(80) }}
+MAX_CPU_USAGE={{ database_max_cpu_usage | default(80) }}
+
+# Function to log messages
+log() {
+    echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
+}
+
+# Function to send alerts
+send_alert() {
+    local message="$1"
+    local severity="${2:-INFO}"
+    echo "[$(date +'%Y-%m-%d %H:%M:%S')] [$severity] $message" | tee -a "$ALERT_FILE"
+    
+    # In a real implementation, this would integrate with the monitoring system
+    # For now, we're just logging to a file
+}
+
+# Function to check disk space
+check_disk_space() {
+    local usage=$(df /var/lib | tail -1 | awk '{print $5}' | sed 's/%//')
+    if [ "$usage" -gt "$MAX_DISK_USAGE" ]; then
+        send_alert "Disk usage is ${usage}% (threshold: ${MAX_DISK_USAGE}%)" "WARNING"
+        return 1
+    else
+        log "Disk usage is ${usage}% (OK)"
+        return 0
+    fi
+}
+
+# Function to check memory usage
+check_memory_usage() {
+    local usage=$(free | grep Mem | awk '{printf("%.0f", $3/$2 * 100.0)}')
+    if [ "$usage" -gt "$MAX_MEMORY_USAGE" ]; then
+        send_alert "Memory usage is ${usage}% (threshold: ${MAX_MEMORY_USAGE}%)" "WARNING"
+        return 1
+    else
+        log "Memory usage is ${usage}% (OK)"
+        return 0
+    fi
+}
+
+# Function to check CPU usage
+check_cpu_usage() {
+    local usage=$(top -bn1 | grep "Cpu(s)" | awk '{print $2}' | sed 's/%us,//')
+    # Convert to integer (remove decimal part)
+    usage=${usage%.*}
+    if [ "$usage" -gt "$MAX_CPU_USAGE" ]; then
+        send_alert "CPU usage is ${usage}% (threshold: ${MAX_CPU_USAGE}%)" "WARNING"
+        return 1
+    else
+        log "CPU usage is ${usage}% (OK)"
+        return 0
+    fi
+}
+
+# Function to check PostgreSQL status
+check_postgresql_status() {
+    if command -v pg_isready &> /dev/null; then
+        if pg_isready -q; then
+            log "PostgreSQL is accepting connections"
+            return 0
+        else
+            send_alert "PostgreSQL is not accepting connections" "CRITICAL"
+            return 1
+        fi
+    else
+        log "PostgreSQL not installed, skipping check"
+        return 0
+    fi
+}
+
+# Function to check Neo4j status
+check_neo4j_status() {
+    if [ -f /etc/neo4j/neo4j.conf ]; then
+        local neo4j_port=$(grep "dbms.connector.bolt.listen_address" /etc/neo4j/neo4j.conf | cut -d: -f2)
+        if [ -z "$neo4j_port" ]; then
+            neo4j_port=7687
+        fi
+        
+        if nc -z localhost "$neo4j_port"; then
+            log "Neo4j is accepting connections on port $neo4j_port"
+            return 0
+        else
+            send_alert "Neo4j is not accepting connections on port $neo4j_port" "CRITICAL"
+            return 1
+        fi
+    else
+        log "Neo4j not installed, skipping check"
+        return 0
+    fi
+}
+
+# Function to check OpenSearch status
+check_opensearch_status() {
+    if [ -d /opt/opensearch ]; then
+        local opensearch_port={{ opensearch_port | default(9200) }}
+        if nc -z localhost "$opensearch_port"; then
+            log "OpenSearch is accepting connections on port $opensearch_port"
+            return 0
+        else
+            send_alert "OpenSearch is not accepting connections on port $opensearch_port" "CRITICAL"
+            return 1
+        fi
+    else
+        log "OpenSearch not installed, skipping check"
+        return 0
+    fi
+}
+
+# Function to communicate with other agents
+communicate_with_agents() {
+    local message="$1"
+    log "Communicating with other agents: $message"
+    
+    # In a real implementation, this would:
+    # - Send messages to RabbitMQ/Redis for other agents
+    # - Update shared knowledge graph in Neo4j
+    # - Notify AI agent brain system
+    
+    # For now, we'll just log it
+    echo "$(date): $message" >> /var/log/database/agent_communication.log
+}
+
+# Main monitoring function
+main() {
+    log "=== Database Monitoring Cycle ==="
+    
+    local issues_found=0
+    
+    # Check system resources
+    if ! check_disk_space; then
+        issues_found=$((issues_found + 1))
+    fi
+    
+    if ! check_memory_usage; then
+        issues_found=$((issues_found + 1))
+    fi
+    
+    if ! check_cpu_usage; then
+        issues_found=$((issues_found + 1))
+    fi
+    
+    # Check database services
+    {% if postgresql_enabled | bool %}
+    if ! check_postgresql_status; then
+        issues_found=$((issues_found + 1))
+    fi
+    {% endif %}
+    
+    {% if neo4j_enabled | bool %}
+    if ! check_neo4j_status; then
+        issues_found=$((issues_found + 1))
+    fi
+    {% endif %}
+    
+    {% if opensearch_enabled | bool %}
+    if ! check_opensearch_status; then
+        issues_found=$((issues_found + 1))
+    fi
+    {% endif %}
+    
+    if [ "$issues_found" -gt 0 ]; then
+        log "Monitoring cycle completed with $issues_found issues"
+        communicate_with_agents "Database monitoring cycle completed with $issues_found issues"
+    else
+        log "Monitoring cycle completed successfully - no issues found"
+        communicate_with_agents "Database monitoring cycle completed successfully"
+    fi
+}
+
+# Run main function
+main

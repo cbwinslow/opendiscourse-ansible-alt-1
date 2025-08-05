@@ -1,0 +1,25 @@
+# Ansible managed - Fail2ban configuration
+# Configured with safe defaults to prevent accidental lockout
+
+[DEFAULT]
+# Ban time: 10 minutes (not too harsh)
+bantime = 600
+# Find time: 10 minutes
+findtime = 600
+# Max retry: 5 attempts (reasonable)
+maxretry = 5
+
+# Backend 
+backend = auto
+
+# Ignore local networks (add your IP if static)
+ignoreip = 127.0.0.1/8 ::1
+
+[sshd]
+enabled = true
+port = ssh
+logpath = /var/log/auth.log
+# More lenient for SSH to prevent lockout
+maxretry = 6
+bantime = 300
+findtime = 600

@@ -132,16 +132,9 @@ services:
 
   caddy:
     container_name: caddy
-    image: docker.io/library/caddy:2-alpine
+    image: caddy:2-builder
     restart: unless-stopped
-    ports:
-      - 80:80/tcp
-      - 443:443/tcp
-    expose:
-      - 2019/tcp
-      - 443/tcp
-      - 443/udp
-      - 80/tcp
+    network_mode: "host"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./caddy-addon:/etc/caddy/addons:ro
@@ -157,6 +150,7 @@ services:
       - LANGFUSE_HOSTNAME=${LANGFUSE_HOSTNAME:-":8007"}
       - NEO4J_HOSTNAME=${NEO4J_HOSTNAME:-":8008"}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL:-internal}
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
     cap_drop:
       - ALL
     cap_add:

@@ -1,0 +1,72 @@
+# Custom fail2ban configuration
+# Managed by Ansible - Do not edit manually
+
+[DEFAULT]
+# Ban time in seconds ({{ security_fail2ban_bantime }} seconds = {{ (security_fail2ban_bantime / 3600) | round(1) }} hours)
+bantime = {{ security_fail2ban_bantime }}
+
+# Time window to count failures ({{ security_fail2ban_findtime }} seconds = {{ (security_fail2ban_findtime / 60) | round(1) }} minutes)
+findtime = {{ security_fail2ban_findtime }}
+
+# Number of failures before ban
+maxretry = {{ security_fail2ban_maxretry }}
+
+# Backend to use
+backend = systemd
+
+# Email settings
+destemail = {{ security_monitoring_email }}
+sender = fail2ban@{{ inventory_hostname }}
+mta = sendmail
+
+# Action to take when ban occurs
+action = %(action_mwl)s
+
+[sshd]
+enabled = true
+port = {{ ssh_port }}
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = {{ security_fail2ban_ssh_maxretry }}
+bantime = {{ security_fail2ban_ssh_bantime }}
+
+# Whitelist emergency and trusted IPs
+ignoreip = 127.0.0.1/8 ::1 {{ security_whitelist_ips | join(' ') }}
+
+[sshd-ddos]
+enabled = true
+port = {{ ssh_port }}
+filter = sshd-ddos
+logpath = /var/log/auth.log
+maxretry = 2
+bantime = {{ security_fail2ban_bantime * 2 }}
+
+[apache-auth]
+enabled = {{ 'true' if 'apache' in group_names else 'false' }}
+port = http,https
+filter = apache-auth
+logpath = /var/log/apache*/*error.log
+maxretry = 3
+
+[nginx-auth]
+enabled = {{ 'true' if 'nginx' in group_names else 'false' }}
+port = http,https
+filter = nginx-http-auth
+logpath = /var/log/nginx/error.log
+maxretry = 3
+
+[postfix]
+enabled = {{ 'true' if security_enable_mail_protection else 'false' }}
+port = smtp,465,submission
+filter = postfix
+logpath = /var/log/mail.log
+maxretry = 3
+
+# Custom filter for repeated connection attempts
+[repeated-connect]
+enabled = true
+filter = repeated-connect
+logpath = /var/log/auth.log
+maxretry = 10
+findtime = 300
+bantime = 3600

@@ -1,0 +1,129 @@
+#!/bin/bash
+# Database Backup Script
+# This script creates backups of all configured databases
+
+set -e
+
+# Configuration
+BACKUP_DIR="/opt/database/backups"
+RETENTION_DAYS={{ database_backup_retention_days | default(30) }}
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+
+# Function to log messages
+log() {
+    echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1"
+}
+
+# Function to create backup directory
+create_backup_directory() {
+    mkdir -p "$BACKUP_DIR"
+    log "Backup directory created: $BACKUP_DIR"
+}
+
+# Function to backup PostgreSQL
+backup_postgresql() {
+    if command -v pg_dump &> /dev/null; then
+        log "Starting PostgreSQL backup..."
+        
+        # Backup all databases
+        pg_dumpall > "$BACKUP_DIR/postgresql_all_$TIMESTAMP.sql"
+        log "PostgreSQL backup completed: postgresql_all_$TIMESTAMP.sql"
+        
+        # Compress the backup
+        gzip "$BACKUP_DIR/postgresql_all_$TIMESTAMP.sql"
+        log "PostgreSQL backup compressed"
+    else
+        log "PostgreSQL not installed, skipping backup"
+    fi
+}
+
+# Function to backup Neo4j
+backup_neo4j() {
+    if [ -d /opt/neo4j ] && command -v neo4j-admin &> /dev/null; then
+        log "Starting Neo4j backup..."
+        
+        # Stop Neo4j service for consistent backup
+        systemctl stop neo4j
+        
+        # Create backup
+        neo4j-admin dump --database=neo4j --to="$BACKUP_DIR/neo4j_$TIMESTAMP.dump"
+        log "Neo4j backup completed: neo4j_$TIMESTAMP.dump"
+        
+        # Start Neo4j service
+        systemctl start neo4j
+    else
+        log "Neo4j not installed, skipping backup"
+    fi
+}
+
+# Function to backup OpenSearch
+backup_opensearch() {
+    if [ -d /opt/opensearch ]; then
+        log "Starting OpenSearch backup..."
+        
+        # Create snapshot repository if it doesn't exist
+        curl -X PUT "localhost:{{ opensearch_port | default(9200) }}/_snapshot/backup" -H 'Content-Type: application/json' -d'{
+            "type": "fs",
+            "settings": {
+                "location": "'"$BACKUP_DIR/opensearch_snapshots"'",
+                "compress": true
+            }
+        }'
+        
+        # Create snapshot
+        curl -X PUT "localhost:{{ opensearch_port | default(9200) }}/_snapshot/backup/snapshot_$TIMESTAMP?wait_for_completion=true"
+        log "OpenSearch backup completed: snapshot_$TIMESTAMP"
+    else
+        log "OpenSearch not installed, skipping backup"
+    fi
+}
+
+# Function to clean up old backups
+cleanup_old_backups() {
+    log "Cleaning up backups older than $RETENTION_DAYS days..."
+    find "$BACKUP_DIR" -name "*.sql.gz" -mtime +$RETENTION_DAYS -delete
+    find "$BACKUP_DIR" -name "*.dump" -mtime +$RETENTION_DAYS -delete
+    find "$BACKUP_DIR" -name "snapshot_*" -mtime +$RETENTION_DAYS -delete
+    log "Old backups cleanup completed"
+}
+
+# Function to communicate with other agents
+communicate_with_agents() {
+    local message="$1"
+    log "Communicating with other agents: $message"
+    
+    # In a real implementation, this would:
+    # - Send messages to RabbitMQ/Redis for other agents
+    # - Update shared knowledge graph in Neo4j
+    # - Notify AI agent brain system
+    
+    # For now, we'll just log it
+    echo "$(date): $message" >> /var/log/database/agent_communication.log
+}
+
+# Main backup function
+main() {
+    log "=== Database Backup Process Started ==="
+    
+    create_backup_directory
+    
+    {% if postgresql_enabled | bool %}
+    backup_postgresql
+    {% endif %}
+    
+    {% if neo4j_enabled | bool %}
+    backup_neo4j
+    {% endif %}
+    
+    {% if opensearch_enabled | bool %}
+    backup_opensearch
+    {% endif %}
+    
+    cleanup_old_backups
+    
+    log "=== Database Backup Process Completed ==="
+    communicate_with_agents "Database backup process completed successfully"
+}
+
+# Run main function
+main

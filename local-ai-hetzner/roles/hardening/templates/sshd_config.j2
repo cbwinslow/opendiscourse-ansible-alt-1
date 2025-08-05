@@ -1,0 +1,30 @@
+# Ansible managed - SSH hardening configuration
+# But keeping safe defaults to prevent lockout
+
+# Network settings
+Port 22
+Protocol 2
+AddressFamily inet
+
+# Authentication
+PermitRootLogin yes  # SAFE: Keeping root login enabled
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/authorized_keys
+PasswordAuthentication no  # Secure: Only key-based auth
+ChallengeResponseAuthentication no
+UsePAM yes
+
+# Security settings  
+X11Forwarding no
+PrintMotd no
+AcceptEnv LANG LC_*
+Subsystem sftp /usr/lib/openssh/sftp-server
+
+# Rate limiting (gentle to prevent lockout)
+MaxAuthTries 6
+MaxSessions 10
+ClientAliveInterval 300
+ClientAliveCountMax 2
+
+# Allow your specific user/key setup
+AllowUsers root

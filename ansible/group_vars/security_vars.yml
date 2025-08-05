@@ -1,0 +1,106 @@
+# Security Hardening Variables for Ansible
+# Add these to your group_vars/all.yml or host_vars/
+
+# SSH Security Configuration
+ssh_allowed_users: "cbwinslow"
+ssh_port: 22
+ssh_protocol: 2
+ssh_permit_root_login: "no"
+ssh_password_authentication: "yes"  # Set to "no" after setting up SSH keys
+ssh_pubkey_authentication: "yes"
+ssh_permit_empty_passwords: "no"
+ssh_max_auth_tries: 3
+ssh_client_alive_interval: 300
+ssh_client_alive_count_max: 2
+ssh_x11_forwarding: "no"
+
+# Emergency Users Configuration
+emergency_users:
+  - name: emergency
+    password: emergency123
+    groups: sudo
+  - name: backup  
+    password: backup123
+    groups: sudo
+
+# Firewall Configuration
+security_hardening:
+  firewall:
+    default_policy: deny
+    default_outgoing_policy: allow
+    allow_ports:
+      - port: 22
+        proto: tcp
+        comment: "SSH"
+      - port: 80
+        proto: tcp
+        comment: "HTTP"
+        rule: allow
+      - port: 443
+        proto: tcp
+        comment: "HTTPS"
+        rule: allow
+
+# fail2ban Configuration
+fail2ban:
+  enabled: true
+  bantime: 1800
+  findtime: 600
+  maxretry: 3
+  ignoreip: 
+    - "127.0.0.1/8"
+    - "::1"
+    - "10.0.0.0/8"
+    - "172.16.0.0/12" 
+    - "192.168.0.0/16"
+  jails:
+    sshd:
+      enabled: true
+      port: 22
+      filter: sshd
+      logpath: /var/log/auth.log
+      maxretry: 3
+      bantime: 1800
+
+# Security Packages
+security_packages:
+  - fail2ban
+  - ufw
+  - unattended-upgrades
+  - logwatch
+  - rkhunter
+  - chkrootkit
+  - aide
+
+# Automatic Updates
+security_updates:
+  enabled: true
+  unattended_upgrades: true
+  auto_reboot: false
+  auto_reboot_time: "06:00"
+
+# Audit Configuration  
+auditd:
+  enabled: true
+  log_file: /var/log/audit/audit.log
+  max_log_file: 50
+  max_log_file_action: rotate
+
+# System Hardening
+system_hardening:
+  disable_unused_filesystems: true
+  secure_shared_memory: true
+  disable_core_dumps: true
+  enable_aslr: true
+  
+# Monitoring Configuration
+monitoring:
+  log_retention_days: 90
+  security_scan_schedule: "0 2 * * 0"  # Weekly on Sunday at 2 AM
+  daily_security_check: true
+
+# Backup Configuration for Security
+security_backups:
+  enabled: true
+  backup_dir: "/root/security_backups"
+  retention_days: 30

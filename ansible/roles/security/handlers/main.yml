@@ -1,0 +1,94 @@
+---
+- name: restart sshd
+  systemd:
+    name: sshd
+    state: restarted
+
+- name: restart ssh
+  systemd:
+    name: ssh
+    state: restarted
+
+- name: restart ossec
+  systemd:
+    name: ossec
+    state: restarted
+
+- name: restart snort
+  systemd:
+    name: snort
+    state: restarted
+
+- name: restart fail2ban
+  systemd:
+    name: fail2ban
+    state: restarted
+    enabled: yes
+  listen: "restart fail2ban service"
+
+- name: reload fail2ban
+  service:
+    name: fail2ban
+    state: reloaded
+  listen: "reload fail2ban service"
+
+- name: restart ufw
+  command: ufw --force reload
+  listen: "restart firewall"
+
+- name: reload ufw
+  command: ufw reload
+  listen: "reload firewall"
+
+- name: validate ssh config
+  command: sshd -t
+  listen: "validate ssh configuration"
+  register: ssh_config_test
+  failed_when: ssh_config_test.rc != 0
+
+- name: validate fail2ban config
+  command: fail2ban-client --test
+  listen: "validate fail2ban configuration"
+  register: fail2ban_config_test
+  failed_when: fail2ban_config_test.rc != 0
+
+- name: emergency access check
+  shell: |
+    # Verify emergency users can still access
+    {% for user in security_emergency_users %}
+    if ! id "{{ user.name }}" >/dev/null 2>&1; then
+      echo "ERROR: Emergency user {{ user.name }} does not exist!"
+      exit 1
+    fi
+    if ! groups "{{ user.name }}" | grep -q sudo; then
+      echo "ERROR: Emergency user {{ user.name }} is not in sudo group!"
+      exit 1
+    fi
+    {% endfor %}
+    echo "All emergency users verified"
+  listen: "verify emergency access"
+  register: emergency_check
+  failed_when: emergency_check.rc != 0
+
+- name: backup configuration
+  shell: |
+    mkdir -p /opt/security-backups/$(date +%Y%m%d-%H%M%S)
+    cp -r /etc/ssh /opt/security-backups/$(date +%Y%m%d-%H%M%S)/
+    cp -r /etc/fail2ban /opt/security-backups/$(date +%Y%m%d-%H%M%S)/
+    cp /etc/ufw/ufw.conf /opt/security-backups/$(date +%Y%m%d-%H%M%S)/
+  listen: "backup security config"
+
+- name: restart suricata
+  systemd:
+    name: suricata
+    state: restarted
+
+- name: restart fail2ban
+  systemd:
+    name: fail2ban
+    state: restarted
+
+- name: restart auditd
+  systemd:
+    name: auditd
+    state: restarted

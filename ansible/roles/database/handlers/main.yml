@@ -1,13 +1,105 @@
 ---
+# Database Handlers
+# This file contains handlers for database service management
+
 - name: restart postgresql
   systemd:
     name: postgresql
     state: restarted
+    enabled: yes
+  when: postgresql_enabled | bool
+
 - name: restart neo4j
   systemd:
     name: neo4j
     state: restarted
+    enabled: yes
+  when: neo4j_enabled | bool
+
 - name: restart opensearch
   systemd:
     name: opensearch
     state: restarted
+    enabled: yes
+  when: opensearch_enabled | bool
+
+- name: reload postgresql
+  systemd:
+    name: postgresql
+    state: reloaded
+  when: postgresql_enabled | bool
+
+- name: reload neo4j
+  systemd:
+    name: neo4j
+    state: reloaded
+  when: neo4j_enabled | bool
+
+- name: reload opensearch
+  systemd:
+    name: opensearch
+    state: reloaded
+  when: opensearch_enabled | bool
+
+- name: start postgresql
+  systemd:
+    name: postgresql
+    state: started
+    enabled: yes
+  when: postgresql_enabled | bool
+
+- name: start neo4j
+  systemd:
+    name: neo4j
+    state: started
+    enabled: yes
+  when: neo4j_enabled | bool
+
+- name: start opensearch
+  systemd:
+    name: opensearch
+    state: started
+    enabled: yes
+  when: opensearch_enabled | bool
+
+- name: stop postgresql
+  systemd:
+    name: postgresql
+    state: stopped
+  when: postgresql_enabled | bool
+
+- name: stop neo4j
+  systemd:
+    name: neo4j
+    state: stopped
+  when: neo4j_enabled | bool
+
+- name: stop opensearch
+  systemd:
+    name: opensearch
+    state: stopped
+  when: opensearch_enabled | bool
+
+- name: check postgresql status
+  command: pg_isready
+  register: postgresql_status
+  changed_when: false
+  when: postgresql_enabled | bool
+
+- name: check neo4j status
+  uri:
+    url: "http://localhost:{{ neo4j_http_port | default(7474) }}"
+    method: GET
+    status_code: 200
+  register: neo4j_status
+  changed_when: false
+  when: neo4j_enabled | bool
+
+- name: check opensearch status
+  uri:
+    url: "http://localhost:{{ opensearch_port | default(9200) }}"
+    method: GET
+    status_code: 200
+  register: opensearch_status
+  changed_when: false
+  when: opensearch_enabled | bool

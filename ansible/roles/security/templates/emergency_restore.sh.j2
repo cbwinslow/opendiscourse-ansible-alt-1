@@ -1,0 +1,77 @@
+#!/bin/bash
+# Emergency Access Restore Script for Ansible-managed servers
+# This script restores SSH access if security configurations lock you out
+
+echo "=== EMERGENCY ACCESS RESTORE ==="
+echo "⚠️  This script will temporarily disable security measures!"
+echo ""
+
+# Check if running as root
+if [[ $EUID -ne 0 ]]; then
+   echo "❌ This script must be run as root"
+   echo "Usage: sudo bash emergency_access_restore.sh"
+   exit 1
+fi
+
+# Backup current configs
+BACKUP_DIR="/root/emergency_backup_$(date +%Y%m%d_%H%M%S)"
+mkdir -p "$BACKUP_DIR"
+
+echo "📁 Creating backups in: $BACKUP_DIR"
+cp /etc/ssh/sshd_config "$BACKUP_DIR/" 2>/dev/null || true
+ufw status > "$BACKUP_DIR/ufw_status.txt" 2>/dev/null || true
+systemctl status fail2ban > "$BACKUP_DIR/fail2ban_status.txt" 2>/dev/null || true
+
+echo ""
+echo "🔓 Step 1: Disabling fail2ban temporarily..."
+systemctl stop fail2ban 2>/dev/null || true
+fail2ban-client unban --all 2>/dev/null || true
+
+echo ""
+echo "🔓 Step 2: Opening firewall for SSH..."
+ufw allow 22/tcp 2>/dev/null || true
+
+echo ""
+echo "🔓 Step 3: Fixing SSH configuration..."
+
+# Ensure emergency users can access
+if grep -q "^AllowUsers" /etc/ssh/sshd_config; then
+    sed -i 's/^AllowUsers.*$/AllowUsers {{ ssh_allowed_users }} emergency backup/' /etc/ssh/sshd_config
+else
+    echo "AllowUsers {{ ssh_allowed_users }} emergency backup" >> /etc/ssh/sshd_config
+fi
+
+# Ensure password authentication is enabled
+sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+sed -i 's/^#PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+
+# Test SSH config
+echo ""
+echo "🧪 Testing SSH configuration..."
+if sshd -t; then
+    echo "✅ SSH configuration is valid"
+    echo ""
+    echo "🔄 Restarting SSH service..."
+    systemctl restart ssh
+    echo "✅ SSH service restarted"
+else
+    echo "❌ SSH configuration invalid, restoring backup"
+    cp "$BACKUP_DIR/sshd_config" /etc/ssh/sshd_config
+    systemctl restart ssh
+    echo "⚠️  SSH config restored to backup"
+fi
+
+echo ""
+echo "✅ Emergency access restore complete!"
+echo ""
+echo "🔑 Available emergency accounts:"
+echo "   - emergency:emergency123"
+echo "   - backup:backup123"
+echo "   - {{ ssh_allowed_users }} (your original user)"
+echo ""
+echo "⚠️  IMPORTANT: Re-run your security hardening after resolving the issue!"
+echo "   - Re-enable fail2ban: systemctl start fail2ban"
+echo "   - Review firewall rules: ufw status"
+echo "   - Run full security audit"
+echo ""
+echo "📁 Backups saved in: $BACKUP_DIR"

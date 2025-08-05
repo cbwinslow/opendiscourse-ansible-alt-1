@@ -3,3 +3,33 @@
 - name: Print Cloudflare setup message
   debug:
     msg: "Cloudflare role setup complete."
+# ansible/roles/cloudflare-dns/tasks/main.yml
+---
+- name: Configure Cloudflare DNS records
+  cloudflare_zone:
+    zone: "{{ cloudflare_zone | default('opendiscourse.net') }}"
+    record:
+      - type: CNAME
+        name: "{{ item.name }}"
+        content: "{{ item.content }}"
+        proxied: "{{ item.proxied | default(omit) }}"
+        state: present
+    api_key: "{{ cloudflare_api_key | default(CLOUDFLARE_API_KEY) }}"
+    api_user: "{{ cloudflare_user | default(CLOUDFLARE_ACCOUNT_ID) }}"
+  loop:
+    - name: n8n
+      content: "n8n.opendiscourse.net"
+    - name: webui
+      content: "openwebui.opendiscourse.net"
+    - name: flowise
+      content: "flowise.opendiscourse.net"
+    - name: supabase
+      content: "supabase.opendiscourse.net"
+    - name: langfuse
+      content: "langfuse.opendiscourse.net"
+    - name: ollama
+      content: "ollama.opendiscourse.net"
+    - name: searxng
+      content: "searxng.opendiscourse.net"
+    - name: neo4j
+      content: "neo4j.opendiscourse.net"

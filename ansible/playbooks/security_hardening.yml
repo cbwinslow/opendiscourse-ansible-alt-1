@@ -1,0 +1,247 @@
+---
+# Complete Security Hardening Playbook
+# Deploys comprehensive security configuration with emergency access protection
+- name: Security Hardening with Emergency Access Protection
+  hosts: all
+  become: true
+  gather_facts: true
+  
+  vars_files:
+    - ../vars/security_vars.yml
+  
+  pre_tasks:
+    - name: Create security backup directory
+      file:
+        path: "/opt/security-backups/{{ ansible_date_time.iso8601_basic_short }}"
+        state: directory
+        mode: '0700'
+        owner: root
+        group: root
+      
+    - name: Backup current SSH configuration
+      copy:
+        src: /etc/ssh/sshd_config
+        dest: "/opt/security-backups/{{ ansible_date_time.iso8601_basic_short }}/sshd_config.backup"
+        remote_src: yes
+      
+    - name: Backup current UFW configuration
+      shell: ufw status numbered > "/opt/security-backups/{{ ansible_date_time.iso8601_basic_short }}/ufw_rules_backup.txt"
+      ignore_errors: true
+      
+    - name: Backup current fail2ban configuration
+      copy:
+        src: /etc/fail2ban/jail.local
+        dest: "/opt/security-backups/{{ ansible_date_time.iso8601_basic_short }}/jail.local.backup"
+        remote_src: true
+      ignore_errors: true
+
+  tasks:
+    # Emergency Users Management
+    - name: Create emergency access users
+      user:
+        name: "{{ item.name }}"
+        password: "{{ item.password | password_hash('sha512') }}"
+        groups: "{{ item.groups }}"
+        shell: /bin/bash
+        createhome: yes
+        state: present
+      loop: "{{ security_emergency_users }}"
+      notify:
+        - backup security config
+        - verify emergency access
+
+    # System Updates
+    - name: Update package cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install security packages
+      apt:
+        name: "{{ security_packages }}"
+        state: present
+        
+    - name: Upgrade all packages
+      apt:
+        upgrade: dist
+        autoremove: yes
+        autoclean: yes
+
+    # SSH Hardening
+    - name: Deploy hardened SSH configuration
+      template:
+        src: sshd_config.j2
+        dest: /etc/ssh/sshd_config
+        backup: yes
+        validate: '/usr/sbin/sshd -t -f %s'
+      notify:
+        - validate ssh configuration
+        - restart ssh service
+        - verify emergency access
+
+    # Firewall Configuration
+    - name: Reset UFW to defaults
+      ufw:
+        state: reset
+        
+    - name: Set UFW default policies
+      ufw:
+        direction: "{{ item.direction }}"
+        policy: "{{ item.policy }}"
+      loop:
+        - { direction: 'incoming', policy: 'deny' }
+        - { direction: 'outgoing', policy: 'allow' }
+
+    - name: Configure UFW rules
+      ufw:
+        rule: "{{ item.rule }}"
+        port: "{{ item.port }}"
+        proto: "{{ item.proto | default('tcp') }}"
+        comment: "{{ item.comment | default('') }}"
+      loop: "{{ security_firewall_rules }}"
+
+    - name: Enable UFW
+      ufw:
+        state: enabled
+        logging: "{{ security_ufw_logging }}"
+
+    # fail2ban Configuration
+    - name: Deploy fail2ban configuration
+      template:
+        src: fail2ban-custom.conf.j2
+        dest: /etc/fail2ban/jail.local
+        backup: yes
+      notify:
+        - validate fail2ban configuration
+        - restart fail2ban service
+
+    # Security Monitoring Tools
+    - name: Deploy security monitoring scripts
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: '0755'
+        owner: root
+        group: root
+      loop:
+        - { src: 'security_dashboard.sh.j2', dest: '/usr/local/bin/security_dashboard.sh' }
+        - { src: 'emergency_restore.sh.j2', dest: '/root/emergency_restore.sh' }
+      
+    - name: Deploy incident response script
+      copy:
+        src: ../security_incident_response.sh
+        dest: /usr/local/bin/security_incident_response.sh
+        mode: '0755'
+        owner: root
+        group: root
+
+    # Automated Security Updates
+    - name: Configure unattended upgrades
+      template:
+        src: 20auto-upgrades.j2
+        dest: /etc/apt/apt.conf.d/20auto-upgrades
+      when: security_enable_auto_updates
+
+    # Logging and Monitoring
+    - name: Configure logwatch
+      template:
+        src: logwatch.conf.j2
+        dest: /etc/cron.daily/00logwatch
+        mode: '0755'
+      when: security_enable_logwatch
+
+    - name: Create security monitoring cron job
+      cron:
+        name: "Daily security dashboard report"
+        minute: "0"
+        hour: "6"
+        job: "/usr/local/bin/security_dashboard.sh --save > /var/log/daily_security_report.log 2>&1"
+        user: root
+
+    - name: Create security incident check cron job
+      cron:
+        name: "Hourly security incident check"
+        minute: "0"
+        job: "/usr/local/bin/security_incident_response.sh check > /var/log/security_incidents.log 2>&1"
+        user: root
+
+    # System Hardening
+    - name: Set kernel parameters for security
+      sysctl:
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
+        state: present
+        reload: yes
+      loop: "{{ security_kernel_parameters }}"
+      when: security_enable_kernel_hardening
+
+    - name: Configure audit daemon
+      template:
+        src: audit.rules.j2
+        dest: /etc/audit/rules.d/audit.rules
+      notify: restart audit service
+      when: security_enable_auditing
+
+    # File System Security
+    - name: Set secure permissions on sensitive files
+      file:
+        path: "{{ item.path }}"
+        mode: "{{ item.mode }}"
+        owner: "{{ item.owner | default('root') }}"
+        group: "{{ item.group | default('root') }}"
+      loop: "{{ security_file_permissions }}"
+
+    # Network Security
+    - name: Disable unnecessary network services
+      systemd:
+        name: "{{ item }}"
+        state: stopped
+        enabled: false
+      loop: "{{ security_disabled_services }}"
+      ignore_errors: true
+
+  post_tasks:
+    - name: Verify SSH configuration
+      command: sshd -t
+      register: ssh_test
+      failed_when: ssh_test.rc != 0
+
+    - name: Verify UFW status
+      command: ufw status
+      register: ufw_status
+      failed_when: "'Status: active' not in ufw_status.stdout"
+
+    - name: Verify fail2ban status
+      systemd:
+        name: fail2ban
+        state: started
+      register: fail2ban_status
+
+    - name: Generate security report
+      template:
+        src: security_report.j2
+        dest: "/var/log/ansible_security_deployment_{{ ansible_date_time.iso8601_basic_short }}.log"
+
+    - name: Display deployment summary
+      debug:
+        msg:
+          - "=== SECURITY HARDENING DEPLOYMENT COMPLETE ==="
+          - "Deployment time: {{ ansible_date_time.iso8601 }}"
+          - "Server: {{ inventory_hostname }}"
+          - "SSH service: {{ 'OK' if ssh_test.rc == 0 else 'ERROR' }}"
+          - "UFW firewall: {{ 'Active' if 'Status: active' in ufw_status.stdout else 'Inactive' }}"
+          - "fail2ban: {{ 'Running' if fail2ban_status.state == 'started' else 'Stopped' }}"
+          - "Emergency users: {{ security_emergency_users | map(attribute='name') | list | join(', ') }}"
+          - ""
+          - "Security tools installed:"
+          - "- /usr/local/bin/security_dashboard.sh"
+          - "- /usr/local/bin/security_incident_response.sh"
+          - "- /root/emergency_restore.sh"
+          - ""
+          - "To monitor security: sudo /usr/local/bin/security_dashboard.sh"
+          - "For incident response: sudo /usr/local/bin/security_incident_response.sh"
+          - ""
+          - "🔒 Your server is now comprehensively secured!"
+
+  handlers:
+    - import_tasks: handlers/main.yml
