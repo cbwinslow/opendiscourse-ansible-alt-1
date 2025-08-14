@@ -1,3 +1,34 @@
+# Hetzner Cloud Deployment
+
+## Provision Servers
+
+Prerequisites:
+1. Export your Hetzner Cloud API token
+2. Ensure your SSH public key is uploaded in Hetzner and note its name
+
+```bash
+export HCLOUD_TOKEN=your_token_here
+ansible-galaxy collection install -r ansible/collections/requirements.yml
+ansible-playbook ansible/playbooks/provision_hetzner.yml \
+  -e server_count=1 \
+  -e server_name_prefix=ai-srv \
+  -e ssh_key_name=default
+```
+
+Result: Inventory file at `ansible/inventory/generated/hetzner.yml`.
+
+## Deploy Stack to Provisioned Hosts
+
+Add/merge generated inventory into your main inventory groups (e.g. assign hosts to `ai`, `databases`, etc.) then run:
+
+```bash
+ansible-playbook -i ansible/inventory/generated/hetzner.yml ansible/site.yml --tags "docker,ai"
+```
+
+## Cleanup / Destroy (Manual for now)
+
+Currently destruction is manual via `hcloud server delete <name>` or add a future playbook using `state: absent`.
+
 # Project Tasks
 
 ## Infrastructure Setup

@@ -1,0 +1,107 @@
+---
+# CLI-based Hetzner provisioning (fallback when Python modules misbehave)
+# Requirements: hcloud CLI, jq, HCLOUD_TOKEN env var
+# Usage:
+#   ansible-playbook ansible/playbooks/provision_hetzner_cli.yml -e server_count=1 -e ssh_key_name=opendiscourse
+
+- name: Provision Hetzner via CLI
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    server_count: "{{ server_count | default(1) }}"
+    server_name_prefix: "{{ server_name_prefix | default('ai-srv') }}"
+    server_type: "{{ server_type | default('cpx31') }}"
+    server_location: "{{ server_location | default('fsn1') }}"
+    server_image: "{{ server_image | default('ubuntu-24.04') }}"
+    ssh_key_name: "{{ ssh_key_name | default('opendiscourse') }}"
+    network_name: "{{ network_name | default('') }}"
+    inventory_dir: "{{ playbook_dir }}/../inventory/generated"
+  tasks:
+    - name: Assert HCLOUD_TOKEN present
+      ansible.builtin.fail:
+        msg: "HCLOUD_TOKEN env var not set"
+      when: lookup('env','HCLOUD_TOKEN') | length == 0
+
+    - name: Check for hcloud CLI
+      ansible.builtin.command: hcloud version
+      register: hcloud_version
+      changed_when: false
+
+    - name: Fetch SSH key list JSON
+      ansible.builtin.command: hcloud ssh-key list -o json
+      register: ssh_key_raw
+      changed_when: false
+
+    - name: Derive matching SSH key
+      ansible.builtin.set_fact:
+        key_match: "{{ (ssh_key_raw.stdout | from_json) | selectattr('name','equalto', ssh_key_name) | list }}"
+
+    - name: Fail if SSH key not found (upload manually first)
+      ansible.builtin.fail:
+        msg: "SSH key '{{ ssh_key_name }}' not found in Hetzner (upload in console or via CLI)"
+      when: key_match | length == 0
+
+    - name: Fetch existing networks
+      ansible.builtin.command: hcloud network list -o json
+      register: networks_raw
+      changed_when: false
+      when: network_name | length > 0
+
+    - name: Create network if missing
+      ansible.builtin.command: >-
+        hcloud network create --name {{ network_name }} --ip-range 10.20.0.0/16
+      when: network_name | length > 0 and ((networks_raw.stdout | from_json) | selectattr('name','equalto', network_name) | list | length) == 0
+
+    - name: Mark network creation result (idempotent info)
+      ansible.builtin.set_fact:
+        network_created: "{{ network_name if (network_name | length > 0 and ((networks_raw.stdout | from_json) | selectattr('name','equalto', network_name) | list | length) == 0) else '' }}"
+      when: network_name | length > 0
+
+    - name: List existing servers JSON
+      ansible.builtin.command: hcloud server list -o json
+      register: servers_raw
+      changed_when: false
+
+    - name: Create missing servers (loop)
+      ansible.builtin.command: >-
+        hcloud server create --name {{ server_name_prefix }}-{{ item }} --type {{ server_type }} --image {{ server_image }} --location {{ server_location }} --ssh-key {{ ssh_key_name }} {{ '--network ' + network_name if network_name|length>0 else '' }} -o json
+      register: create_result
+      loop: "{{ range(1, (server_count | int) + 1) | list }}"
+      when: (servers_raw.stdout | from_json) | selectattr('name','equalto', server_name_prefix ~ '-' ~ item) | list | length == 0
+
+    - name: Refresh server list post-create
+      ansible.builtin.command: hcloud server list -o json
+      register: servers_raw_final
+      changed_when: false
+
+    - name: Filter relevant servers
+      ansible.builtin.set_fact:
+        target_servers: "{{ (servers_raw_final.stdout | from_json) | selectattr('name','search','^' + server_name_prefix + '-') | list }}"
+
+    - name: Create inventory directory
+      ansible.builtin.file:
+        path: "{{ inventory_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Write inventory file (CLI variant)
+      ansible.builtin.copy:
+        dest: "{{ inventory_dir }}/hetzner.yml"
+        mode: '0644'
+        content: |
+          ---
+          all:
+            children:
+              ai:
+                hosts:
+          {% for s in target_servers %}
+                  {{ s.name }}:
+                    ansible_host: {{ s.public_net.ipv4.ip }}
+                    ansible_user: root
+                    ansible_python_interpreter: /usr/bin/python3
+          {% endfor %}
+
+    - name: Show resulting hosts
+      ansible.builtin.debug:
+        var: target_servers

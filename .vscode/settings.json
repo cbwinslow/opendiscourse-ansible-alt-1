@@ -1,3 +1,10 @@
 {
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "DockerRun.DisableDockerrc": true,
+    "DockerRun.Containers": [
+        "a534c2e4eb7c",
+        "562653ad8273",
+        "9bf55329f75c",
+        "36a99127cf8c"
+    ]
 }

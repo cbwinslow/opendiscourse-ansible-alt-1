@@ -1,0 +1,113 @@
+---
+# Provision infrastructure on Hetzner Cloud
+# Usage:
+#   export HCLOUD_TOKEN=VvmIgN3yLx2U0M00rXl8HcMwTg1KSXSRysGencHiV41hhZZwqPt8HfH8ALAc2lND
+#   ansible-playbook -i inventory/static provision_hetzner.yml \
+#       -e hcloud_api_token=$HCLOUD_TOKEN \
+#       -e server_count=1
+#
+# Variables you can pass:
+#   server_count        - number of servers (default 1)
+#   server_name_prefix  - prefix for server names (default "ai-srv")
+#   server_type         - hetzner type (cx22, cpx31, ccx23 etc)
+#   server_location     - hel1/fsn1/nbg1 (default fsn1)
+#   server_image        - ubuntu-24.04
+#   ssh_key_name        - existing uploaded SSH key name in Hetzner
+#   network_name        - private network name (optional)
+#
+# After provisioning, an inventory snippet is written to generated_inventory/hetzner.yml
+
+- name: Provision Hetzner Cloud servers
+  hosts: localhost
+  connection: local
+  become: false
+  gather_facts: false
+  vars:
+    server_count: "{{ server_count | default(1) }}"
+    server_name_prefix: "{{ server_name_prefix | default('ai-srv') }}"
+    server_type: "{{ server_type | default('cpx31') }}"
+    server_location: "{{ server_location | default('fsn1') }}"
+    server_image: "{{ server_image | default('ubuntu-24.04') }}"
+    ssh_key_name: "{{ ssh_key_name | default('default') }}"
+    # network_name intentionally not forced; it will be tested with defined + length later
+  tasks:
+    - name: Resolve Hetzner API token (var or env)
+      ansible.builtin.set_fact:
+        hcloud_api_token_effective: "{{ hcloud_api_token | default( lookup('env','HCLOUD_TOKEN') ) | default('', true) }}"
+
+    - name: Fail if API token missing
+      ansible.builtin.fail:
+        msg: "Hetzner API token not provided (export HCLOUD_TOKEN or pass -e hcloud_api_token=...)"
+      when: hcloud_api_token_effective | length == 0
+
+    - name: Gather SSH key ID
+      hetzner.hcloud.hcloud_ssh_key_info:
+        api_token: "{{ hcloud_api_token_effective }}"
+        name: "{{ ssh_key_name }}"
+      register: sshkey
+      when: not ansible_check_mode
+
+    - name: Ensure SSH key exists
+      ansible.builtin.fail:
+        msg: "SSH key '{{ ssh_key_name }}' not found in Hetzner account"
+      when: not ansible_check_mode and (sshkey.hcloud_ssh_key_info | length == 0)
+
+    - name: Create private network (optional)
+      hetzner.hcloud.hcloud_network:
+        api_token: "{{ hcloud_api_token_effective }}"
+        name: "{{ network_name }}"
+        ip_range: 10.10.0.0/16
+        state: present
+      register: net
+      when: not ansible_check_mode and (network_name is defined) and (network_name | length > 0)
+
+    - name: Provision servers
+      hetzner.hcloud.hcloud_server:
+        api_token: "{{ hcloud_api_token_effective }}"
+        name: "{{ server_name_prefix }}-{{ item }}"
+        server_type: "{{ server_type }}"
+        image: "{{ server_image }}"
+        location: "{{ server_location }}"
+        ssh_keys:
+          - "{{ ssh_key_name }}"
+        networks: "{{ network_name if (network_name is defined and network_name | length > 0) else omit }}"
+        state: present
+      loop: "{{ range(1, (server_count | int) + 1) | list }}"
+      register: created
+      when: not ansible_check_mode
+
+    - name: Initialize empty provision results in check mode
+      ansible.builtin.set_fact:
+        created: { results: [] }
+      when: ansible_check_mode
+
+    - name: Create directory for generated inventory
+      ansible.builtin.file:
+        path: "{{ playbook_dir }}/../inventory/generated"
+        state: directory
+        mode: '0755'
+
+    - name: Write inventory file
+      ansible.builtin.copy:
+        dest: "{{ playbook_dir }}/../inventory/generated/hetzner.yml"
+        mode: '0644'
+        content: |
+          ---
+          all:
+            children:
+              ai:
+                hosts:
+          {% for r in created.results %}
+                  {{ r.hcloud_server.name }}:
+                    ansible_host: {{ r.hcloud_server.ipv4_address }}
+                    ansible_user: root
+                    ansible_python_interpreter: /usr/bin/python3
+          {% endfor %}
+
+    - name: Display inventory file path
+      ansible.builtin.debug:
+        msg: "Inventory written to inventory/generated/hetzner.yml"
+
+    - name: Output server details
+      ansible.builtin.debug:
+        var: created.results

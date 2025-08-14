@@ -1,0 +1,13 @@
+---
+# Minimal placeholder fail2ban role
+# TODO: Replace with full configuration (jails, filters, hardening)
+- name: Install fail2ban
+  ansible.builtin.package:
+    name: fail2ban
+    state: present
+
+- name: Ensure fail2ban service enabled & started
+  ansible.builtin.service:
+    name: fail2ban
+    state: started
+    enabled: true
