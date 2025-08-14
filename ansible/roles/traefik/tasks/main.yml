@@ -1,0 +1,65 @@
+---
+- name: Ensure traefik network exists
+  community.docker.docker_network:
+    name: "{{ traefik_network }}"
+    driver: bridge
+    attachable: true
+
+- name: Create config dirs
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ traefik_config_dir }}"
+    - "{{ traefik_config_dir }}/dynamic"
+    - "{{ traefik_config_dir }}/acme"
+    - "{{ traefik_logs_dir }}"
+
+- name: Create acme.json (if using letsencrypt)
+  ansible.builtin.file:
+    path: "{{ traefik_acme_file }}"
+    state: touch
+    mode: '0600'
+  when: traefik_use_letsencrypt | bool
+
+- name: Deploy static config
+  ansible.builtin.template:
+    src: traefik.yml.j2
+    dest: "{{ traefik_config_dir }}/traefik.yml"
+    mode: '0644'
+
+- name: Run Traefik container
+  community.docker.docker_container:
+    name: "{{ traefik_container_name }}"
+    image: "traefik:{{ traefik_version }}"
+    restart_policy: unless-stopped
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address={{ traefik_entrypoints.web.address }}"
+      - "--entrypoints.websecure.address={{ traefik_entrypoints.websecure.address }}"
+      - "--api.dashboard={{ traefik_dashboard_enabled | lower }}"
+      - "--api.insecure={{ traefik_api_insecure | lower }}"
+    networks:
+      - name: "{{ traefik_network }}"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "{{ traefik_docker_socket }}:/var/run/docker.sock:ro"
+      - "{{ traefik_config_dir }}:/etc/traefik"
+      - "{{ traefik_logs_dir }}:/var/log/traefik"
+    labels: "{{ ( [
+        'traefik.enable=true',
+        'traefik.http.routers.traefik.rule=Host(`' + traefik_dashboard_domain + '`)',
+        'traefik.http.routers.traefik.entrypoints=web',
+        'traefik.http.routers.traefik.service=api@internal'
+      ] + traefik_additional_labels ) | list }}"
+    env: "{{ traefik_extra_env }}"
+  register: traefik_container
+
+- name: Debug Traefik container result
+  ansible.builtin.debug:
+    var: traefik_container

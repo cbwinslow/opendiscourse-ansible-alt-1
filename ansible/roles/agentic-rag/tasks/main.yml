@@ -19,6 +19,41 @@
     state: present
   become: true
 
+- name: Optionally deploy containerized Agentic RAG (if enabled)
+  when: agentic_rag_containerized | default(true) | bool
+  block:
+    - name: Ensure docker network for traefik exists
+      community.docker.docker_network:
+        name: traefik_public
+        driver: bridge
+        attachable: true
+
+    - name: Run agentic-rag container
+      community.docker.docker_container:
+        name: agentic-rag
+        image: "python:3.11-slim"
+        restart_policy: unless-stopped
+        working_dir: /app
+        command: ["python","-m","http.server","8001"]
+        env:
+          AGENTIC_RAG_PORT: "{{ agentic_rag_port }}"
+        networks:
+          - name: traefik_public
+        labels:
+          traefik.enable: "true"
+          traefik.http.routers.agenticrag.rule: "Host(`{{ agentic_rag_domain | default('rag.' + (traefik_primary_domain | default(primary_domain))) }}`)"
+          traefik.http.routers.agenticrag.entrypoints: "web"
+          traefik.http.services.agenticrag.loadbalancer.server.port: "8001"
+      register: agenticrag_container
+
+    - name: Debug agentic rag container
+      ansible.builtin.debug:
+        var: agenticrag_container
+
+    - name: End containerized path early
+      ansible.builtin.meta: end_block
+  tags: ['agenticrag','container']
+
 - name: Create service user and group
   user:
     name: "{{ agentic_rag_user }}"

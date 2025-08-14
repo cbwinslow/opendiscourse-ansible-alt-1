@@ -1,0 +1,22 @@
+---
+traefik_version: "2.11"
+traefik_container_name: traefik
+traefik_network: traefik_public
+traefik_acme_email: "admin@{{ traefik_primary_domain | default(primary_domain) }}"
+traefik_entrypoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+traefik_dashboard_enabled: true
+traefik_dashboard_domain: "{{ traefik_dashboard_domain | default('dash.' + (traefik_primary_domain | default(primary_domain))) }}"
+traefik_logs_dir: /var/log/traefik
+traefik_config_dir: /etc/traefik
+traefik_acme_file: /etc/traefik/acme/acme.json
+traefik_additional_labels: []
+traefik_enable_metrics: false
+traefik_use_letsencrypt: false
+traefik_main_domain: "{{ traefik_primary_domain | default(primary_domain) }}"
+traefik_api_insecure: true
+traefik_docker_socket: /var/run/docker.sock
+traefik_extra_env: {}

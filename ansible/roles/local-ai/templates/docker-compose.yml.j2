@@ -6,6 +6,12 @@ services:
     container_name: localai
     restart: {{ local_ai_docker_restart_policy }}
     runtime: {{ local_ai_docker_runtime if local_ai_gpu_enabled else 'runc' }}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.localai.rule=Host(`{{ localai_domain | default(localai_hostname | default(localai_domain_override | default(localai_domain_var | default(localai_domain_fallback | default(localai_domain_final | default(localai_domain) ))) ) | default('localai.' + traefik_primary_domain | default(primary_domain)) }}`)"
+      - "traefik.http.routers.localai.entrypoints=web"
+      - "traefik.http.services.localai.loadbalancer.server.port=8080"
+      - "traefik.http.routers.localai.service=localai"
     ports:
       - "{{ local_ai_bind_ip }}:{{ local_ai_port }}:8080"
       {% if local_ai_integrations.prometheus.enabled %}
@@ -81,3 +87,5 @@ networks:
   default:
     name: {{ local_ai_docker_network }}
     driver: bridge
+  traefik_public:
+    external: true

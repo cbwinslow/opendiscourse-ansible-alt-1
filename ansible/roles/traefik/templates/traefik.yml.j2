@@ -1,0 +1,23 @@
+log:
+  level: INFO
+api:
+  dashboard: {{ traefik_dashboard_enabled | lower }}
+  insecure: {{ traefik_api_insecure | lower }}
+providers:
+  docker:
+    exposedByDefault: false
+    network: {{ traefik_network }}
+entryPoints:
+  web:
+    address: {{ traefik_entrypoints.web.address | quote }}
+  websecure:
+    address: {{ traefik_entrypoints.websecure.address | quote }}
+{% if traefik_use_letsencrypt %}
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: {{ traefik_acme_email }}
+      storage: {{ traefik_acme_file }}
+      httpChallenge:
+        entryPoint: web
+{% endif %}
