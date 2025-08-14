@@ -1,0 +1,87 @@
+---
+- name: Minimal base setup (packages + Docker)
+  hosts: ai
+  become: true
+  gather_facts: true
+  vars:
+    docker_packages:
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+  pre_tasks:
+    - name: Ensure apt cache is up to date
+      apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Remove legacy Docker repo file if present (conflict cleanup)
+      file:
+        path: /etc/apt/sources.list.d/download_docker_com_linux_ubuntu.list
+        state: absent
+
+    - name: Ensure keyrings directory exists
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Install prerequisite packages
+      apt:
+        name: "{{ docker_packages }}"
+        state: present
+
+    - name: Add Docker GPG key
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: '0644'
+
+    - name: Add Docker repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable"
+        filename: docker
+        state: present
+
+    - name: Update apt after adding Docker repo
+      apt:
+        update_cache: true
+
+  tasks:
+    - name: Install Docker engine and plugins
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+
+    - name: Ensure docker group exists
+      group:
+        name: docker
+        state: present
+
+    - name: Add current remote user to docker group
+      user:
+        name: "{{ ansible_user | default('root') }}"
+        groups: docker
+        append: true
+      when: ansible_user is defined
+
+    - name: Enable and start Docker service
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Run hello-world container (one-off validation)
+      command: docker run --rm hello-world
+      register: hello_world_result
+      changed_when: false
+      failed_when: hello_world_result.rc != 0 and 'Unable to find image' not in hello_world_result.stderr
+
+    - name: Print hello-world output
+      debug:
+        var: hello_world_result.stdout

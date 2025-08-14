@@ -1,8 +1,11 @@
 ---
-timezone: "America/New_York"
+# Defaults for common role
+ssh_timeout: 30s
+ssh_max_auth_tries: 3
+ssh_port: 22
+timezone: "UTC"
 ntp_servers:
   - "pool.ntp.org"
-ssh_port: 2222
 ssh_password_authentication: false
 ssh_root_login: false
 ufw_default_deny_policy: "deny"

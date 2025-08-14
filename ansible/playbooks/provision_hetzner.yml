@@ -22,14 +22,7 @@
   connection: local
   become: false
   gather_facts: false
-  vars:
-    server_count: "{{ server_count | default(1) }}"
-    server_name_prefix: "{{ server_name_prefix | default('ai-srv') }}"
-    server_type: "{{ server_type | default('cpx31') }}"
-    server_location: "{{ server_location | default('fsn1') }}"
-    server_image: "{{ server_image | default('ubuntu-24.04') }}"
-    ssh_key_name: "{{ ssh_key_name | default('default') }}"
-    # network_name intentionally not forced; it will be tested with defined + length later
+  vars: {}
   tasks:
     - name: Resolve Hetzner API token (var or env)
       ansible.builtin.set_fact:
@@ -64,15 +57,14 @@
     - name: Provision servers
       hetzner.hcloud.hcloud_server:
         api_token: "{{ hcloud_api_token_effective }}"
-        name: "{{ server_name_prefix }}-{{ item }}"
-        server_type: "{{ server_type }}"
-        image: "{{ server_image }}"
-        location: "{{ server_location }}"
+        name: "{{ (server_name_prefix | default('ai-srv')) }}-{{ item }}"
+        server_type: "{{ server_type | default('cpx31') }}"
+        image: "{{ server_image | default('ubuntu-24.04') }}"
+        location: "{{ server_location | default('fsn1') }}"
         ssh_keys:
-          - "{{ ssh_key_name }}"
-        networks: "{{ network_name if (network_name is defined and network_name | length > 0) else omit }}"
+          - "{{ ssh_key_name | default('default') }}"
         state: present
-      loop: "{{ range(1, (server_count | int) + 1) | list }}"
+      loop: "{{ range(1, ((server_count | default(1)) | int) + 1) | list }}"
       register: created
       when: not ansible_check_mode
 
