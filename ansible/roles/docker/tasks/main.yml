@@ -1,50 +1,89 @@
 ---
-- name: Install Docker prerequisites
+# Docker role main tasks rewritten for reliability & idempotency
+
+- name: Gather minimal facts (ensure lsb info)
+  setup:
+    gather_subset:
+      - min
+      - distribution
+
+- name: Ensure prerequisite packages present
   apt:
     name:
-      - apt-transport-https
       - ca-certificates
+      - curl
       - gnupg
       - lsb-release
     state: present
+    update_cache: true
+  register: prereq_result
 
-- name: Add Docker GPG key
-  apt_key:
+- name: Create keyrings directory
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Add Docker GPG key (atomic)
+  get_url:
     url: https://download.docker.com/linux/ubuntu/gpg
-    state: present
+    dest: /etc/apt/keyrings/docker.asc
+    mode: '0644'
+  register: docker_key
 
-- name: Add Docker repository
-  apt_repository:
-    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
-    state: present
+- name: Determine architecture and codename
+  set_fact:
+    docker_arch: "{{ (ansible_architecture in ['x86_64','amd64']) | ternary('amd64', ansible_architecture) }}"
+    docker_codename: "{{ ansible_distribution_release | default(ansible_lsb.codename) }}"
 
-- name: Install Docker
+- name: Remove any legacy Docker list file (prevent duplicate Signed-By issues)
+  file:
+    path: /etc/apt/sources.list.d/docker.list
+    state: absent
+
+- name: Configure Docker apt repository
+  copy:
+    dest: /etc/apt/sources.list.d/docker-ce.list
+    mode: '0644'
+    content: |
+      deb [arch={{ docker_arch }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ docker_codename }} stable
+  register: docker_repo
+
+- name: Update apt cache if repo changed or key changed
+  apt:
+    update_cache: true
+  when: docker_repo.changed or docker_key.changed or prereq_result.changed
+
+- name: Install Docker Engine packages
   apt:
     name:
       - docker-ce
       - docker-ce-cli
       - containerd.io
+      - docker-buildx-plugin
       - docker-compose-plugin
     state: present
+  register: docker_pkgs
 
-- name: Start and enable Docker
-  systemd:
+- name: Ensure docker group exists
+  group:
     name: docker
-    enabled: yes
-    state: started
-
-- name: Add deploy user to docker group
-  user:
-    name: "{{ ansible_user }}"
-    groups: docker
-    append: yes
-
-- name: Install Docker Compose
-  pip:
-    name: docker-compose
     state: present
 
-- name: Create Docker directories
+- name: Add current ansible user to docker group
+  user:
+    name: "{{ ansible_user | default(ansible_ssh_user | default('root')) }}"
+    groups: docker
+    append: true
+
+- name: Enable & start Docker service
+  systemd:
+    name: docker
+    enabled: true
+    state: started
+  register: docker_service
+
+- name: Create standard docker directories
   file:
     path: "{{ item }}"
     state: directory
@@ -55,33 +94,37 @@
     - /opt/docker/volumes
     - /opt/docker/config
 
-- name: Create Docker config directory
+- name: Ensure /etc/docker exists
   file:
     path: /etc/docker
     state: directory
     mode: '0755'
 
-- name: Configure Docker daemon
+- name: Install daemon configuration
   template:
     src: daemon.json.j2
     dest: /etc/docker/daemon.json
     mode: '0644'
   notify: restart docker
 
-- name: Configure Docker compose version
+- name: Write compose version marker
   copy:
-    content: "{{ docker_compose_version }}"
     dest: /opt/docker/.compose-version
+    content: "{{ docker_compose_version | default('v2') }}"
     mode: '0644'
 
-- name: Create Docker network
-  block:
-    - name: Create Docker network
-      docker_network:
-        name: "{{ docker_network_name }}"
-        driver: bridge
-        ipam_config:
-          - subnet: "{{ docker_network_subnet }}"
-            gateway: "{{ docker_network_gateway }}"
-        state: present
+- name: Create optional custom network
   when: docker_network_name is defined
+  community.docker.docker_network:
+    name: "{{ docker_network_name }}"
+    driver: bridge
+    ipam_config: >-
+      {{ [{'subnet': docker_network_subnet, 'gateway': docker_network_gateway}] if (docker_network_subnet is defined and docker_network_gateway is defined) else omit }}
+    state: present
+
+- name: Debug summary
+  debug:
+    msg:
+      - "Docker packages changed: {{ docker_pkgs.changed }}"
+      - "Docker service changed: {{ docker_service.changed }}"
+      - "Repo changed: {{ docker_repo.changed }}"

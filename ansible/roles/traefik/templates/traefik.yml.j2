@@ -18,6 +18,16 @@ certificatesResolvers:
     acme:
       email: {{ traefik_acme_email }}
       storage: {{ traefik_acme_file }}
+      caServer: {{ traefik_acme_ca_server }}
+{% if traefik_use_dns_challenge %}
+      dnsChallenge:
+        provider: {{ traefik_dns_provider }}
+        delayBeforeCheck: 0
+        resolvers:
+          - 1.1.1.1:53
+          - 8.8.8.8:53
+{% else %}
       httpChallenge:
         entryPoint: web
+{% endif %}
 {% endif %}

@@ -3,7 +3,7 @@
 agentic_rag_enabled: true
 agentic_rag_version: "latest"
 agentic_rag_port: 8001
-agentic_rag_host: "{{ agentic_rag_host }}"
+agentic_rag_host: "0.0.0.0"
 agentic_rag_user: "agenticrag"
 agentic_rag_group: "agenticrag"
 agentic_rag_base_dir: "/opt/agentic-rag"
@@ -34,3 +34,7 @@ cache_ttl: 3600
 # Monitoring
 metrics_enabled: true
 prometheus_port: "{{ prometheus_port }}"
+
+# Containerization toggle and domain
+agentic_rag_containerized: true
+agentic_rag_domain: "rag.{{ traefik_primary_domain | default(primary_domain | default('opendiscourse.net')) }}"

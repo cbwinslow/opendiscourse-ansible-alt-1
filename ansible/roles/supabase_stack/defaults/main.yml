@@ -1,0 +1,35 @@
+---
+# Defaults for supabase_stack role
+
+supabase_stack_enabled: true
+
+# Domains (inherit primary_domain if defined elsewhere)
+supabase_domain: "supabase.{{ primary_domain | default(traefik_primary_domain | default('example.com')) }}"
+n8n_domain: "n8n.{{ primary_domain | default(traefik_primary_domain | default('example.com')) }}"
+flowise_domain: "flowise.{{ primary_domain | default(traefik_primary_domain | default('example.com')) }}"
+openwebui_domain: "openwebui.{{ primary_domain | default(traefik_primary_domain | default('example.com')) }}"
+# Alternate dashed variant (if DNS uses open-webui.*); override this in group_vars to switch
+openwebui_alt_domain: "open-webui.{{ primary_domain | default(traefik_primary_domain | default('example.com')) }}"
+searxng_domain: "searxng.{{ primary_domain | default(traefik_primary_domain | default('example.com')) }}"
+neo4j_domain: "neo4j.{{ primary_domain | default(traefik_primary_domain | default('example.com')) }}"
+langfuse_domain: "langfuse.{{ primary_domain | default(traefik_primary_domain | default('example.com')) }}"
+
+# Basic secret placeholders (override in group_vars/all or host_vars with real secure values)
+supabase_postgres_password: "ChangeMe_Postgres!123"
+supabase_jwt_secret: "ChangeMeJWTSecretAtLeast32CharsLong1234"
+supabase_anon_key: "replace_anon_key"
+supabase_service_role_key: "replace_service_role_key"
+supabase_dashboard_username: "supabase"
+supabase_dashboard_password: "ChangeMeDashboardPwd"
+supabase_pooler_tenant_id: 1000
+
+# Langfuse / ancillary service secrets (placeholders)
+clickhouse_password: "ChangeMeClickhousePwd"
+minio_root_password: "ChangeMeMinioPwd"
+langfuse_salt: "ChangeMeLangfuseSalt"
+nextauth_secret: "ChangeMeNextAuthSecret"
+encryption_key: "ChangeMeEncryptionKey32CharsLong000000"
+neo4j_auth: "neo4j/ChangeMeNeo4jPwd"
+
+# Directory where stack will live on remote host
+supabase_stack_root: "/opt/supabase-stack"

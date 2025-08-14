@@ -1,0 +1,145 @@
+---
+- name: "Supabase stack | Ensure role enabled"
+  ansible.builtin.debug:
+    msg: "supabase_stack_enabled=false -> skipping deployment"
+  when: not supabase_stack_enabled | bool
+
+- name: "Supabase stack | Create root directory"
+  ansible.builtin.file:
+    path: "{{ supabase_stack_root }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  when: supabase_stack_enabled | bool
+
+- name: "Supabase stack | Install git (required for clone)"
+  ansible.builtin.package:
+    name: git
+    state: present
+  when: supabase_stack_enabled | bool
+
+- name: "Supabase stack | Clone Supabase repository (shallow)"
+  ansible.builtin.git:
+    repo: https://github.com/supabase/supabase.git
+    dest: "{{ supabase_stack_root }}/supabase"
+    version: master
+    depth: 1
+    update: yes
+  register: supabase_git
+  when: supabase_stack_enabled | bool
+
+- name: "Supabase stack | Template env file"
+  ansible.builtin.template:
+    src: supabase.env.j2
+    dest: "{{ supabase_stack_root }}/supabase/docker/.env"
+    owner: root
+    group: root
+    mode: '0600'
+  when: supabase_stack_enabled | bool
+  register: supabase_env
+
+- name: "Supabase stack | Launch/Update services"
+  ansible.builtin.command: >
+    docker compose -p supabase -f {{ supabase_stack_root }}/supabase/docker/docker-compose.yml up -d
+  args:
+    chdir: "{{ supabase_stack_root }}/supabase/docker"
+  register: supabase_up
+  when: supabase_stack_enabled | bool
+  changed_when: >-
+    supabase_up.stdout is defined and (
+    'Creating' in supabase_up.stdout or
+    'Recreating' in supabase_up.stdout or
+    supabase_git.changed or supabase_env.changed)
+  failed_when: supabase_up.rc != 0
+
+- name: "Supabase stack | Optionally attach traefik labels (lightweight approach)"
+  ansible.builtin.copy:
+    dest: "{{ supabase_stack_root }}/supabase/docker/docker-compose.override.traefik.yml"
+    mode: '0644'
+    content: |
+      version: '3.8'
+      services:
+        kong:
+          labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.supabase.rule=Host(`{{ supabase_domain }}`)"
+            - "traefik.http.routers.supabase.entrypoints=web"
+            - "traefik.http.services.supabase.loadbalancer.server.port=8000"
+          networks:
+            - traefik_public
+        n8n:
+          labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.n8n.rule=Host(`{{ n8n_domain }}`)"
+            - "traefik.http.routers.n8n.entrypoints=web"
+            - "traefik.http.services.n8n.loadbalancer.server.port=5678"
+          networks:
+            - traefik_public
+        flowise:
+          labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.flowise.rule=Host(`{{ flowise_domain }}`)"
+            - "traefik.http.routers.flowise.entrypoints=web"
+            - "traefik.http.services.flowise.loadbalancer.server.port=3001"
+          networks:
+            - traefik_public
+        open-webui:
+          labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.openwebui.rule=Host(`{{ openwebui_domain }}`)"
+            - "traefik.http.routers.openwebui.entrypoints=web"
+            - "traefik.http.services.openwebui.loadbalancer.server.port=8080"
+          networks:
+            - traefik_public
+        searxng:
+          labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.searxng.rule=Host(`{{ searxng_domain }}`)"
+            - "traefik.http.routers.searxng.entrypoints=web"
+            - "traefik.http.services.searxng.loadbalancer.server.port=8080"
+          networks:
+            - traefik_public
+        neo4j:
+          labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.neo4j.rule=Host(`{{ neo4j_domain }}`)"
+            - "traefik.http.routers.neo4j.entrypoints=web"
+            - "traefik.http.services.neo4j.loadbalancer.server.port=7474"
+          networks:
+            - traefik_public
+        langfuse-web:
+          labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.langfuse.rule=Host(`{{ langfuse_domain }}`)"
+            - "traefik.http.routers.langfuse.entrypoints=web"
+            - "traefik.http.services.langfuse.loadbalancer.server.port=3000"
+          networks:
+            - traefik_public
+      networks:
+        traefik_public:
+          external: true
+  when: supabase_stack_enabled | bool
+
+- name: "Supabase stack | Relaunch with traefik override"
+  ansible.builtin.command: >
+    docker compose -p supabase -f {{ supabase_stack_root }}/supabase/docker/docker-compose.yml -f {{ supabase_stack_root }}/supabase/docker/docker-compose.override.traefik.yml up -d
+  args:
+    chdir: "{{ supabase_stack_root }}/supabase/docker"
+  register: supabase_up_traefik
+  when: supabase_stack_enabled | bool
+  changed_when: >-
+    supabase_up_traefik.stdout is defined and (
+    'Creating' in supabase_up_traefik.stdout or
+    'Recreating' in supabase_up_traefik.stdout)
+  failed_when: supabase_up_traefik.rc != 0
+
+- name: "Supabase stack | Summary"
+  ansible.builtin.debug:
+    msg: |
+      Supabase deployment complete.
+      Git changed: {{ supabase_git.changed | default(false) }}
+      Env changed: {{ supabase_env.changed | default(false) }}
+      Compose output (truncated): {{ (supabase_up.stdout | default(''))[0:400] }}
+      Traefik override output (truncated): {{ (supabase_up_traefik.stdout | default(''))[0:400] }}
+  when: supabase_stack_enabled | bool

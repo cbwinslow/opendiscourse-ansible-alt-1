@@ -44,25 +44,35 @@
 #     - { role: redis, tags: ['database', 'cache'] }
 #     - { role: rabbitmq, tags: ['messaging'] }
 
-# AI & ML Services (reduced to existing roles)
-- name: Deploy AI/ML infrastructure
+## Unified Application & Data Stack (Traefik, Supabase, LocalAI, RAG)
+- name: Deploy unified application stack
   hosts: ai
   become: true
-  tags: [ai, ml]
+  tags: [app, stack]
   roles:
+    - { role: traefik, tags: ['reverse-proxy'] }            # ensure network first
+    - { role: supabase_stack, tags: ['supabase', 'database'] }
     - { role: local-ai, tags: ['ai', 'inference'] }
     - { role: agentic-rag, tags: ['ai', 'rag'] }
 
-# Web & API Services (reduced to existing roles)
-- name: Deploy web and API services
-  hosts: web
+# Quick redeploy play for Traefik only
+- name: Redeploy Traefik only
+  hosts: ai
   become: true
-  tags: [web, api]
+  tags: [traefik-redeploy]
   roles:
-    - { role: nginx, tags: ['web', 'reverse-proxy'] }
-    - { role: traefik, tags: ['web', 'reverse-proxy'] }
-    - { role: caddy, tags: ['web', 'reverse-proxy'] }
-    - { role: fastapi, tags: ['api'] }
+    - { role: traefik, tags: ['reverse-proxy'] }
+
+# --- Legacy Web/API Play (retained for reference; unified stack above supersedes this) ---
+# - name: Deploy web and API services
+#   hosts: web
+#   become: true
+#   tags: [web, api]
+#   roles:
+#     - { role: nginx, tags: ['web', 'reverse-proxy'] }
+#     - { role: traefik, tags: ['web', 'reverse-proxy'] }
+#     - { role: caddy, tags: ['web', 'reverse-proxy'] }
+#     - { role: fastapi, tags: ['api'] }
 
 # Logging & Analytics (placeholder)
 # - name: Deploy logging and analytics
@@ -115,6 +125,45 @@
     - name: Display service status
       ansible.builtin.debug:
         var: service_status
+
+    - name: Inspect traefik_public network (if docker present)
+      community.docker.docker_network_info:
+        name: traefik_public
+      register: traefik_public_info
+      failed_when: false
+      changed_when: false
+
+    - name: Report traefik_public network existence
+      ansible.builtin.debug:
+        msg: >-
+          {{ 'traefik_public network present with ' ~ (traefik_public_info.network.Containers | length | default(0)) ~ ' attached containers'
+             if traefik_public_info.network is defined else 'traefik_public network NOT found' }}
+
+    - name: Get Traefik container facts
+      community.docker.docker_container_info:
+        name: "{{ hostvars[inventory_hostname].get('traefik_container_name', 'traefik') }}"
+      register: traefik_container_info
+      failed_when: false
+      changed_when: false
+
+    - name: Validate Traefik container running state
+      ansible.builtin.assert:
+        that:
+          - (traefik_container_info.exists | default(false)) | bool
+          - (traefik_container_info.container.State.Running | default(false)) | bool
+        fail_msg: "Traefik container not running on host"
+        success_msg: "Traefik container running"
+      when: traefik_container_info is defined
+
+    - name: Check Traefik attached to traefik_public
+      ansible.builtin.assert:
+        that:
+          - >-
+            traefik_public_info.network is defined and
+            (traefik_container_info.container.NetworkSettings.Networks.keys() | list) | intersect(['traefik_public']) | length > 0
+        fail_msg: "Traefik not attached to traefik_public network"
+        success_msg: "Traefik attached to traefik_public network"
+      when: traefik_container_info.exists | default(false)
 
 # Post-Deployment Configuration
 - name: Configure service integrations

@@ -1,4 +1,14 @@
 ---
+# Clean rebuilt tasks file for Traefik role
+
+- name: Ensure traefik_public docker network exists (external shared)
+  community.docker.docker_network:
+    name: traefik_public
+    state: present
+    driver: bridge
+    attachable: true
+  become: true
+
 - name: Ensure traefik network exists
   community.docker.docker_network:
     name: "{{ traefik_network }}"
@@ -29,18 +39,55 @@
     dest: "{{ traefik_config_dir }}/traefik.yml"
     mode: '0644'
 
-- name: Run Traefik container
-  community.docker.docker_container:
-    name: "{{ traefik_container_name }}"
-    image: "traefik:{{ traefik_version }}"
-    restart_policy: unless-stopped
-    command:
+- name: Build base Traefik command list
+  ansible.builtin.set_fact:
+    traefik_command:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address={{ traefik_entrypoints.web.address }}"
       - "--entrypoints.websecure.address={{ traefik_entrypoints.websecure.address }}"
       - "--api.dashboard={{ traefik_dashboard_enabled | lower }}"
       - "--api.insecure={{ traefik_api_insecure | lower }}"
+
+- name: Append ACME base flags
+  ansible.builtin.set_fact:
+    traefik_command: >-
+      {{ traefik_command + [
+        '--certificatesresolvers.letsencrypt.acme.email=' + traefik_acme_email,
+        '--certificatesresolvers.letsencrypt.acme.storage=' + traefik_acme_file
+      ] }}
+  when: traefik_use_letsencrypt | bool
+
+- name: Use staging CA server flag if requested
+  ansible.builtin.set_fact:
+    traefik_command: >-
+      {{ traefik_command + [ '--certificatesresolvers.letsencrypt.acme.caserver=' + ( 'https://acme-staging-v02.api.letsencrypt.org/directory' ) ] }}
+  when: traefik_use_letsencrypt | bool and traefik_acme_staging | bool
+
+- name: Append ACME DNS challenge flag
+  ansible.builtin.set_fact:
+    traefik_command: >-
+      {{ traefik_command + [ '--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=' + traefik_dns_provider ] }}
+  when: traefik_use_letsencrypt | bool and traefik_use_dns_challenge | bool
+
+- name: Append ACME HTTP challenge flag
+  ansible.builtin.set_fact:
+    traefik_command: >-
+      {{ traefik_command + [ '--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web' ] }}
+  when: traefik_use_letsencrypt | bool and not traefik_use_dns_challenge | bool
+
+- name: Build Traefik environment map
+  ansible.builtin.set_fact:
+    traefik_env_final: >-
+      {{ traefik_extra_env | combine( (traefik_use_letsencrypt and traefik_use_dns_challenge and (traefik_cloudflare_zone_api_token|default('')|length > 0))
+        | ternary({ traefik_cloudflare_api_token_var: traefik_cloudflare_zone_api_token }, {}) ) }}
+
+- name: Run Traefik container
+  community.docker.docker_container:
+    name: "{{ traefik_container_name }}"
+    image: "traefik:{{ traefik_version }}"
+    restart_policy: unless-stopped
+    command: "{{ traefik_command }}"
     networks:
       - name: "{{ traefik_network }}"
     ports:
@@ -51,13 +98,28 @@
       - "{{ traefik_docker_socket }}:/var/run/docker.sock:ro"
       - "{{ traefik_config_dir }}:/etc/traefik"
       - "{{ traefik_logs_dir }}:/var/log/traefik"
-    labels: "{{ ( [
-        'traefik.enable=true',
-        'traefik.http.routers.traefik.rule=Host(`' + traefik_dashboard_domain + '`)',
-        'traefik.http.routers.traefik.entrypoints=web',
-        'traefik.http.routers.traefik.service=api@internal'
-      ] + traefik_additional_labels ) | list }}"
-    env: "{{ traefik_extra_env }}"
+    labels: >-
+      {{ {
+        'traefik.enable': 'true',
+        'traefik.http.routers.traefik.rule': 'Host(`' + traefik_dashboard_domain + '`)',
+        'traefik.http.routers.traefik.entrypoints': 'web',
+        'traefik.http.routers.traefik.service': 'api@internal'
+      }
+      | combine( (traefik_use_letsencrypt and traefik_enable_secure_dashboard) | ternary({
+          'traefik.http.routers.traefik-secure.rule': 'Host(`' + traefik_dashboard_domain + '`)',
+          'traefik.http.routers.traefik-secure.entrypoints': 'websecure',
+          'traefik.http.routers.traefik-secure.tls': 'true',
+          'traefik.http.routers.traefik-secure.tls.certresolver': 'letsencrypt',
+          'traefik.http.routers.traefik-secure.service': 'api@internal'
+        }, {}) )
+      | combine( (traefik_use_letsencrypt and traefik_enable_https_redirect) | ternary({
+          'traefik.http.middlewares.redirect-to-https.redirectscheme.scheme': 'https',
+          'traefik.http.routers.traefik.middlewares': 'redirect-to-https'
+        }, {}) )
+      | combine( (traefik_additional_labels | default([])) | items2dict(key_name='key', value_name='value')
+          if (traefik_additional_labels is iterable and traefik_additional_labels | length > 0 and traefik_additional_labels[0] is mapping)
+          else {} ) }}
+    env: "{{ traefik_env_final }}"
   register: traefik_container
 
 - name: Debug Traefik container result

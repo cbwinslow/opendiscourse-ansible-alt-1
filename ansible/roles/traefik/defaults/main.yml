@@ -16,7 +16,15 @@ traefik_acme_file: /etc/traefik/acme/acme.json
 traefik_additional_labels: []
 traefik_enable_metrics: false
 traefik_use_letsencrypt: false
+traefik_use_dns_challenge: false
+traefik_dns_provider: cloudflare
+traefik_cloudflare_api_token_var: CF_DNS_API_TOKEN  # name of env var (value supplied via vault/inventory) (updated from CLOUDFLARE_API_TOKEN for consistency with runbook & Traefik docs)
+traefik_cloudflare_zone_api_token: ""  # leave blank; set via vault or extra vars
+traefik_acme_ca_server: "https://acme-v02.api.letsencrypt.org/directory"
+traefik_acme_staging: false
 traefik_main_domain: "{{ traefik_primary_domain | default(primary_domain) }}"
 traefik_api_insecure: true
 traefik_docker_socket: /var/run/docker.sock
 traefik_extra_env: {}
+traefik_enable_https_redirect: true  # when TLS enabled, add redirect middleware
+traefik_enable_secure_dashboard: true  # create secure router in addition to insecure one (remove insecure later)
