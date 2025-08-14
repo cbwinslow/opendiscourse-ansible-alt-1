@@ -1,0 +1,12 @@
+---
+# Traefik ACME staging configuration for ai group
+traefik_use_letsencrypt: true
+traefik_use_dns_challenge: true
+traefik_acme_staging: true
+traefik_acme_email: admin@opendiscourse.net
+# Use dashed DNS variant or keep default; uncomment to switch
+# openwebui_domain: "{{ openwebui_alt_domain }}"
+traefik_enable_secure_dashboard: true
+traefik_enable_https_redirect: true
+# Cloudflare token must be supplied via vault variable vault_cloudflare_api_token in secrets
+traefik_cloudflare_zone_api_token: "{{ vault_cloudflare_api_token }}"
