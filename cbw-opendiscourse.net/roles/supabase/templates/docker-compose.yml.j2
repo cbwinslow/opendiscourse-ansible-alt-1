@@ -1,0 +1,133 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - "{{ app_data_root }}/supabase/db-data:/var/lib/postgresql/data"
+    networks:
+      - {{ shared_network }}
+  kong:
+    image: {{ supabase_images.kong }}
+    environment:
+      - KONG_DATABASE=off
+      - SUPABASE_ANON_KEY=${ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SERVICE_ROLE_KEY}
+      - KONG_DNS_RESOLVER=1.1.1.1
+  - KONG_PLUGINS=prometheus
+  - KONG_STATUS_LISTEN=0.0.0.0:8100
+  - KONG_DECLARATIVE_CONFIG=/kong/declarative/kong.yml
+    depends_on:
+      - db
+    networks:
+      - {{ shared_network }}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.supabase-kong.rule=Host(`{{ services.supabase_kong }}`) && PathPrefix(`/`)"
+      - "traefik.http.routers.supabase-kong.entrypoints=websecure"
+      - "traefik.http.services.supabase-kong.loadbalancer.server.port=8000"
+  studio:
+    image: {{ supabase_images.studio }}
+    environment:
+      - STUDIO_PG_META_URL=${STUDIO_PG_META_URL}
+      - SUPABASE_URL=https://{{ services.supabase_kong }}
+      - SUPABASE_ANON_KEY=${ANON_KEY}
+    depends_on:
+      - kong
+    networks:
+      - {{ shared_network }}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.supabase-studio.rule=Host(`{{ services.supabase_studio }}`)"
+      - "traefik.http.routers.supabase-studio.entrypoints=websecure"
+      - "traefik.http.services.supabase-studio.loadbalancer.server.port=3000"
+  postgrest:
+    image: {{ supabase_images.rest }}
+    depends_on:
+      - db
+    environment:
+      - PGRST_DB_URI=postgres://postgres:${POSTGRES_PASSWORD}@db:5432/postgres
+    networks:
+      - {{ shared_network }}
+  gotrue:
+    image: {{ supabase_images.gotrue }}
+    environment:
+      - API_EXTERNAL_URL=${API_EXTERNAL_URL}
+      - GOTRUE_API_URL=${GOTRUE_API_URL}
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      - db
+    networks:
+      - {{ shared_network }}
+  storage:
+    image: {{ supabase_images.storage }}
+    networks:
+      - {{ shared_network }}
+  realtime:
+    image: {{ supabase_images.realtime }}
+    depends_on:
+      - db
+    networks:
+      - {{ shared_network }}
+{% if supabase.enable_vector | default(true) %}
+  vector:
+    image: {{ supabase_images.vector }}
+    depends_on:
+      - db
+    networks:
+      - {{ shared_network }}
+{% endif %}
+{% if supabase.enable_logflare | default(false) %}
+  logflare:
+    image: {{ supabase_images.logflare }}
+    depends_on:
+      - db
+    networks:
+      - {{ shared_network }}
+{% endif %}
+{% if supabase.enable_imgproxy | default(false) %}
+  imgproxy:
+    image: {{ supabase_images.imgproxy }}
+    depends_on:
+      - storage
+    networks:
+      - {{ shared_network }}
+{% endif %}
+{% if supabase.enable_pg_meta | default(false) %}
+  pg-meta:
+    image: {{ supabase_images.pg_meta }}
+    depends_on:
+      - db
+    networks:
+      - {{ shared_network }}
+{% endif %}
+{% if supabase.enable_edge_runtime | default(false) %}
+  edge-runtime:
+    image: {{ supabase_images.edge_runtime }}
+    depends_on:
+      - kong
+    networks:
+      - {{ shared_network }}
+{% endif %}
+{% if supabase.enable_migration_service | default(false) %}
+  migration-service:
+    image: {{ supabase_images.migration_service }}
+    depends_on:
+      - db
+    networks:
+      - {{ shared_network }}
+{% endif %}
+  postgres-exporter:
+    image: {{ observability_images.postgres_exporter }}
+    environment:
+      - DATA_SOURCE_NAME=postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/postgres?sslmode=disable
+    depends_on:
+      - db
+    networks:
+      - {{ shared_network }}
+networks:
+  {{ shared_network }}:
+    external: true

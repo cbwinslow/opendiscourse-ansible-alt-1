@@ -1,0 +1,38 @@
+---
+- name: Base provisioning (docker)
+  hosts: all
+  become: true
+  roles:
+    - base
+
+- name: Traefik reverse proxy
+  hosts: all
+  become: true
+  # Traefik disabled temporarily to allow direct service startup without reverse proxy binding conflicts.
+  # roles:
+  #   - traefik
+
+- name: Supabase platform
+  hosts: all
+  become: true
+  roles:
+    - supabase
+  tags: [supabase]
+
+- name: Observability stack
+  hosts: all
+  become: true
+  roles:
+    - observability
+  tags: [observability]
+
+- name: Core services
+  hosts: all
+  become: true
+  roles:
+    - n8n
+    - flowise
+    - openwebui
+    - searxng
+    - neo4j
+    - langfuse

@@ -1,0 +1,25 @@
+---
+- name: Deploy searxng compose file
+  tags: [searxng]
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ app_data_root }}/searxng/docker-compose.yml"
+    mode: '0644'
+
+- name: Launch searxng
+  tags: [searxng]
+  community.docker.docker_compose_v2:
+    project_src: "{{ app_data_root }}/searxng"
+    state: present
+
+- name: Health check searxng
+  tags: [searxng]
+  uri:
+    url: "https://{{ services.searxng }}"
+    method: GET
+    return_content: false
+    validate_certs: false
+  register: searxng_health
+  retries: 20
+  delay: 5
+  until: searxng_health.status is defined and searxng_health.status in [200,301,302,401]

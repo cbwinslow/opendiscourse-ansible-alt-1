@@ -1,0 +1,88 @@
+# Global variables for simplified stack
+root_domain: opendiscourse.net
+email_acme: admin@opendiscourse.net
+
+# Subdomain mappings (can override individually later)
+services:
+  traefik: traefik.{{ root_domain }}
+  n8n: n8n.{{ root_domain }}
+  flowise: flowise.{{ root_domain }}
+  openwebui: chat.{{ root_domain }}
+  searxng: search.{{ root_domain }}
+  neo4j: graph.{{ root_domain }}
+  langfuse: langfuse.{{ root_domain }}
+  supabase_kong: api.{{ root_domain }}
+  supabase_studio: studio.{{ root_domain }}
+  grafana: grafana.{{ root_domain }}
+  prometheus: prometheus.{{ root_domain }}
+
+# Simple flags
+acme_staging: true   # switch to false for production certs later
+
+# Versions
+traefik_image: traefik:v2.11
+n8n_image: n8nio/n8n:latest
+flowise_image: flowiseai/flowise:latest
+openwebui_image: ghcr.io/open-webui/open-webui:latest
+searxng_image: searxng/searxng:latest
+neo4j_image: neo4j:5
+langfuse_image: ghcr.io/langfuse/langfuse:latest
+supabase_images:
+  kong: supabase/kong:latest
+  studio: supabase/studio:latest
+  rest: supabase/postgrest:latest
+  realtime: supabase/realtime:latest
+  meta: supabase/meta:latest
+  storage: supabase/storage-api:latest
+  gotrue: supabase/gotrue:latest
+  admin_api: supabase/admin-api:latest
+  vector: supabase/vector:latest
+  pg_meta: supabase/pg-meta:latest
+  imgproxy: supabase/imgproxy:latest
+  logflare: supabase/logflare:latest
+  edge_runtime: supabase/edge-runtime:latest
+  migration_service: supabase/migration-tool:latest
+
+observability_images:
+  prometheus: prom/prometheus:latest
+  grafana: grafana/grafana:latest
+  postgres_exporter: prometheuscommunity/postgres-exporter:latest
+  loki: grafana/loki:2.9.8
+  promtail: grafana/promtail:2.9.8
+
+supabase:
+  # Secrets now expected to come from vault (see README). These are fallbacks only and should be removed in prod.
+  db_password: "{{ vault_supabase_db_password | default('insecure_db_password', true) }}"
+  jwt_secret: "{{ vault_supabase_jwt_secret | default('insecure_jwt_secret', true) }}"
+  anon_key: "{{ vault_supabase_anon_key | default('insecure_anon', true) }}"
+  service_role_key: "{{ vault_supabase_service_role_key | default('insecure_service_role', true) }}"
+  enable_vector: true
+  enable_realtime: true
+  enable_logflare: true
+  enable_imgproxy: true
+  enable_pg_meta: true
+  enable_edge_runtime: true
+  enable_migration_service: true
+
+supabase_health_endpoints:
+  - name: kong_root
+    url: "https://{{ services.supabase_kong }}"
+    status_codes: [200, 301, 302, 401, 403]
+  - name: auth_health
+    url: "https://{{ services.supabase_kong }}/auth/v1/health"
+    status_codes: [200]
+  - name: rest_root
+    url: "https://{{ services.supabase_kong }}/rest/v1"
+    status_codes: [200, 401, 403]
+  - name: studio_root
+    url: "https://{{ services.supabase_studio }}"
+    status_codes: [200]
+
+shared_network: public_proxy
+
+# Traefik dashboard security (basic auth). If enable set true, ensure dashboard_users is a list of htpasswd formatted entries.
+traefik_dashboard_auth_enabled: false
+traefik_dashboard_users: []  # Example: ["admin:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/"]
+
+# Basic data dirs (host paths)
+app_data_root: /opt/stack

@@ -11,3 +11,11 @@ ssh_root_login: false
 ufw_default_deny_policy: "deny"
 ufw_rules: []
 admin_users: []
+
+# Firewall controls (new safer defaults)
+firewall_enabled: true           # Master switch; set false to skip all UFW configuration
+firewall_allowed_tcp_ports:
+  - 22
+  - 80
+  - 443
+manage_raw_ufw_user_rules: false # If true, still deploy template ufw_rules.j2 (advanced). Otherwise use module-driven rules.

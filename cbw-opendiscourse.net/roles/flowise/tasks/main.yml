@@ -1,0 +1,33 @@
+---
+- name: Create flowise data dir
+  tags: [flowise]
+  file:
+    path: "{{ app_data_root }}/flowise/data"
+    state: directory
+    mode: '0755'
+    recurse: true
+
+- name: Deploy flowise compose file
+  tags: [flowise]
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ app_data_root }}/flowise/docker-compose.yml"
+    mode: '0644'
+
+- name: Launch flowise
+  tags: [flowise]
+  community.docker.docker_compose_v2:
+    project_src: "{{ app_data_root }}/flowise"
+    state: present
+
+- name: Health check flowise
+  tags: [flowise]
+  uri:
+    url: "https://{{ services.flowise }}"
+    method: GET
+    return_content: false
+    validate_certs: false
+  register: flowise_health
+  retries: 20
+  delay: 5
+  until: flowise_health.status is defined and flowise_health.status in [200,301,302,401]

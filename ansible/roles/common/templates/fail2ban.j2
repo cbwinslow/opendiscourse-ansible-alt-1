@@ -1,0 +1,14 @@
+# Managed by Ansible - minimal Fail2Ban jail.local
+[DEFAULT]
+bantime = 10m
+findtime = 10m
+maxretry = 5
+backend = auto
+ignoreip = 127.0.0.1/8 ::1
+
+[sshd]
+enabled = true
+port    = ssh
+filter  = sshd
+logpath = /var/log/auth.log
+maxretry = 5

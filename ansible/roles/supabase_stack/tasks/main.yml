@@ -13,6 +13,38 @@
     mode: '0755'
   when: supabase_stack_enabled | bool
 
+# Quick inline remediation for apt Signed-By conflict when running only with --tags app
+# We remove legacy docker repository lines lacking a signed-by specification so that
+# package installs (e.g. git) succeed without pulling in the full docker role.
+- name: "Supabase stack | Apt cleanup | Identify apt source list files"
+  ansible.builtin.find:
+    paths:
+      - /etc/apt
+      - /etc/apt/sources.list.d
+    patterns: '*.list'
+    file_type: file
+  register: supabase_stack_apt_lists
+  when: supabase_stack_enabled | bool
+
+- name: "Supabase stack | Apt cleanup | Remove legacy docker repo lines"
+  ansible.builtin.lineinfile:
+    path: "{{ item.path }}"
+    regexp: '^deb .*download.docker.com'
+    state: absent
+    backup: false
+  loop: "{{ supabase_stack_apt_lists.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+  register: supabase_stack_docker_repo_line_removals
+  when: supabase_stack_enabled | bool
+
+- name: "Supabase stack | Apt cleanup | Update cache if removals occurred"
+  ansible.builtin.apt:
+    update_cache: true
+  when: supabase_stack_enabled | bool and (
+    supabase_stack_docker_repo_line_removals is defined and
+    (supabase_stack_docker_repo_line_removals.results | selectattr('changed','equalto', true) | list | length) > 0)
+
 - name: "Supabase stack | Install git (required for clone)"
   ansible.builtin.package:
     name: git
@@ -60,60 +92,13 @@
     content: |
       version: '3.8'
       services:
+        # Only attach traefik labels to existing Supabase 'kong' gateway for now.
         kong:
           labels:
             - "traefik.enable=true"
             - "traefik.http.routers.supabase.rule=Host(`{{ supabase_domain }}`)"
             - "traefik.http.routers.supabase.entrypoints=web"
             - "traefik.http.services.supabase.loadbalancer.server.port=8000"
-          networks:
-            - traefik_public
-        n8n:
-          labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.n8n.rule=Host(`{{ n8n_domain }}`)"
-            - "traefik.http.routers.n8n.entrypoints=web"
-            - "traefik.http.services.n8n.loadbalancer.server.port=5678"
-          networks:
-            - traefik_public
-        flowise:
-          labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.flowise.rule=Host(`{{ flowise_domain }}`)"
-            - "traefik.http.routers.flowise.entrypoints=web"
-            - "traefik.http.services.flowise.loadbalancer.server.port=3001"
-          networks:
-            - traefik_public
-        open-webui:
-          labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.openwebui.rule=Host(`{{ openwebui_domain }}`)"
-            - "traefik.http.routers.openwebui.entrypoints=web"
-            - "traefik.http.services.openwebui.loadbalancer.server.port=8080"
-          networks:
-            - traefik_public
-        searxng:
-          labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.searxng.rule=Host(`{{ searxng_domain }}`)"
-            - "traefik.http.routers.searxng.entrypoints=web"
-            - "traefik.http.services.searxng.loadbalancer.server.port=8080"
-          networks:
-            - traefik_public
-        neo4j:
-          labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.neo4j.rule=Host(`{{ neo4j_domain }}`)"
-            - "traefik.http.routers.neo4j.entrypoints=web"
-            - "traefik.http.services.neo4j.loadbalancer.server.port=7474"
-          networks:
-            - traefik_public
-        langfuse-web:
-          labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.langfuse.rule=Host(`{{ langfuse_domain }}`)"
-            - "traefik.http.routers.langfuse.entrypoints=web"
-            - "traefik.http.services.langfuse.loadbalancer.server.port=3000"
           networks:
             - traefik_public
       networks:

@@ -1,0 +1,16 @@
+version: '3.9'
+services:
+  searxng:
+    image: {{ searxng_image }}
+    environment:
+      - BASE_URL=https://{{ services.searxng }}/
+    networks:
+      - {{ shared_network }}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.searxng.rule=Host(`{{ services.searxng }}`)"
+      - "traefik.http.routers.searxng.entrypoints=websecure"
+      - "traefik.http.services.searxng.loadbalancer.server.port=8080"
+networks:
+  {{ shared_network }}:
+    external: true

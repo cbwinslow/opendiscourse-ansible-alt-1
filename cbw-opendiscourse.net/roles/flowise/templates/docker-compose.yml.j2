@@ -1,0 +1,18 @@
+version: '3.9'
+services:
+  flowise:
+    image: {{ flowise_image }}
+    environment:
+      - PORT=3000
+    volumes:
+      - "{{ app_data_root }}/flowise/data:/root/.flowise"
+    networks:
+      - {{ shared_network }}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.flowise.rule=Host(`{{ services.flowise }}`)"
+      - "traefik.http.routers.flowise.entrypoints=websecure"
+      - "traefik.http.services.flowise.loadbalancer.server.port=3000"
+networks:
+  {{ shared_network }}:
+    external: true

@@ -41,6 +41,23 @@
     path: /etc/apt/sources.list.d/docker.list
     state: absent
 
+- name: Locate existing apt source list files
+  find:
+    paths: /etc/apt/sources.list.d
+    patterns: '*.list'
+    file_type: file
+  register: docker_source_lists
+  when: ansible_facts.os_family == 'Debian'
+
+- name: Purge stale docker entries (without signed-by) from list files
+  lineinfile:
+    path: "{{ item.path }}"
+    regexp: '^deb .*download.docker.com/linux/ubuntu'
+    state: absent
+  loop: "{{ docker_source_lists.files }}"
+  when: ansible_facts.os_family == 'Debian' and docker_source_lists is defined
+  ignore_errors: true
+
 - name: Configure Docker apt repository
   copy:
     dest: /etc/apt/sources.list.d/docker-ce.list

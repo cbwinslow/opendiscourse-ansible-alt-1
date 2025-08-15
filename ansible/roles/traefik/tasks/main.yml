@@ -82,6 +82,14 @@
       {{ traefik_extra_env | combine( (traefik_use_letsencrypt and traefik_use_dns_challenge and (traefik_cloudflare_zone_api_token|default('')|length > 0))
         | ternary({ traefik_cloudflare_api_token_var: traefik_cloudflare_zone_api_token }, {}) ) }}
 
+- name: Fail if DNS challenge enabled but Cloudflare token missing
+  ansible.builtin.fail:
+    msg: >-
+      DNS challenge requested (traefik_use_letsencrypt={{ traefik_use_letsencrypt }}, traefik_use_dns_challenge={{ traefik_use_dns_challenge }})
+      but no Cloudflare zone API token value provided (variable traefik_cloudflare_zone_api_token is empty). Set vault_cloudflare_api_token
+      in your vault or disable DNS challenge.
+  when: traefik_use_letsencrypt | bool and traefik_use_dns_challenge | bool and (traefik_cloudflare_zone_api_token | default('') | length == 0)
+
 - name: Run Traefik container
   community.docker.docker_container:
     name: "{{ traefik_container_name }}"

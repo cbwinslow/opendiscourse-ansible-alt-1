@@ -1,0 +1,35 @@
+---
+- name: Create neo4j data directories
+  tags: [neo4j]
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ app_data_root }}/neo4j/data"
+    - "{{ app_data_root }}/neo4j/logs"
+
+- name: Deploy neo4j compose file
+  tags: [neo4j]
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ app_data_root }}/neo4j/docker-compose.yml"
+    mode: '0644'
+
+- name: Launch neo4j
+  tags: [neo4j]
+  community.docker.docker_compose_v2:
+    project_src: "{{ app_data_root }}/neo4j"
+    state: present
+
+- name: Health check neo4j browser
+  tags: [neo4j]
+  uri:
+    url: "https://{{ services.neo4j }}"
+    method: GET
+    return_content: false
+    validate_certs: false
+  register: neo4j_health
+  retries: 30
+  delay: 5
+  until: neo4j_health.status is defined and neo4j_health.status in [200,301,302,401]

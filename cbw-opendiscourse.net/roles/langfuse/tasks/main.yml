@@ -1,0 +1,25 @@
+---
+- name: Deploy langfuse compose file
+  tags: [langfuse]
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ app_data_root }}/langfuse/docker-compose.yml"
+    mode: '0644'
+
+- name: Launch langfuse
+  tags: [langfuse]
+  community.docker.docker_compose_v2:
+    project_src: "{{ app_data_root }}/langfuse"
+    state: present
+
+- name: Health check langfuse
+  tags: [langfuse]
+  uri:
+    url: "https://{{ services.langfuse }}"
+    method: GET
+    return_content: false
+    validate_certs: false
+  register: langfuse_health
+  retries: 20
+  delay: 5
+  until: langfuse_health.status is defined and langfuse_health.status in [200,301,302,401]

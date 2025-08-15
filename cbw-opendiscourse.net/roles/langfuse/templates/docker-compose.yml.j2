@@ -1,0 +1,17 @@
+version: '3.9'
+services:
+  langfuse:
+    image: {{ langfuse_image }}
+    environment:
+      - NEXT_PUBLIC_LF_SERVER_URL=https://{{ services.langfuse }}
+      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/langfuse # placeholder
+    networks:
+      - {{ shared_network }}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.langfuse.rule=Host(`{{ services.langfuse }}`)"
+      - "traefik.http.routers.langfuse.entrypoints=websecure"
+      - "traefik.http.services.langfuse.loadbalancer.server.port=3000"
+networks:
+  {{ shared_network }}:
+    external: true

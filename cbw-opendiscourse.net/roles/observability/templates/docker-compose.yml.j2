@@ -1,0 +1,44 @@
+version: '3.9'
+services:
+  prometheus:
+    image: {{ observability_images.prometheus }}
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    volumes:
+      - "{{ app_data_root }}/observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
+    networks:
+      - {{ shared_network }}
+  grafana:
+    image: {{ observability_images.grafana }}
+    environment:
+      - GF_SERVER_DOMAIN={{ services.grafana }}
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+    volumes:
+      - "{{ app_data_root }}/observability/grafana/dashboards:/var/lib/grafana/dashboards"
+      - "{{ app_data_root }}/observability/grafana/provisioning:/etc/grafana/provisioning"
+    networks:
+      - {{ shared_network }}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=Host(`{{ services.grafana }}`)"
+      - "traefik.http.routers.grafana.entrypoints=websecure"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+  loki:
+    image: {{ observability_images.loki }}
+    command: ["-config.file=/etc/loki/config.yml"]
+    volumes:
+      - "{{ app_data_root }}/observability/loki/config.yml:/etc/loki/config.yml:ro"
+      - "{{ app_data_root }}/observability/loki/data:/loki"
+    networks:
+      - {{ shared_network }}
+  promtail:
+    image: {{ observability_images.promtail }}
+    command: ["--config.file=/etc/promtail/config.yml"]
+    volumes:
+      - "/var/log:/var/log:ro"
+      - "{{ app_data_root }}/observability/promtail/config.yml:/etc/promtail/config.yml:ro"
+    networks:
+      - {{ shared_network }}
+networks:
+  {{ shared_network }}:
+    external: true

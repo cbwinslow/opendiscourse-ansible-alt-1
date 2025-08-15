@@ -113,6 +113,16 @@
   become: true
   tags: [validation, final]
   tasks:
+    - name: Assert critical secrets present
+      ansible.builtin.assert:
+        that:
+          - postgres_admin_password is defined
+          - neo4j_auth_password is defined
+          - n8n_encryption_key is defined
+          - jwt_secret | length >= 16
+          - encryption_key | length >= 16
+        fail_msg: "One or more required secrets are missing. Run vault setup/rotation first."
+        success_msg: "Core secrets present."
     - name: Verify service health (core subset)
       ansible.builtin.shell: |
         systemctl is-active {{ item }}

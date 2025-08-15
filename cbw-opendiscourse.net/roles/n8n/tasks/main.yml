@@ -1,0 +1,33 @@
+---
+- name: Create n8n data dir
+  tags: [n8n]
+  file:
+    path: "{{ app_data_root }}/n8n/data"
+    state: directory
+    mode: '0755'
+    recurse: true
+
+- name: Deploy n8n compose file
+  tags: [n8n]
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ app_data_root }}/n8n/docker-compose.yml"
+    mode: '0644'
+
+- name: Launch n8n
+  tags: [n8n]
+  community.docker.docker_compose_v2:
+    project_src: "{{ app_data_root }}/n8n"
+    state: present
+
+- name: Health check n8n
+  tags: [n8n]
+  uri:
+    url: "https://{{ services.n8n }}"
+    method: GET
+    return_content: false
+    validate_certs: false
+  register: n8n_health
+  retries: 20
+  delay: 5
+  until: n8n_health.status is defined and n8n_health.status in [200,301,302,401]

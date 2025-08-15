@@ -1,0 +1,51 @@
+---
+- name: Create traefik data dir
+  tags: [traefik]
+  file:
+    path: "{{ app_data_root }}/traefik/letsencrypt"
+    state: directory
+    mode: '0755'
+    recurse: true
+
+- name: Create traefik auth dir (if enabled)
+  tags: [traefik]
+  when: traefik_dashboard_auth_enabled | bool
+  file:
+    path: "{{ app_data_root }}/traefik/auth"
+    state: directory
+    mode: '0750'
+
+- name: Write dashboard users file (if enabled)
+  tags: [traefik]
+  when: traefik_dashboard_auth_enabled | bool
+  copy:
+    dest: "{{ app_data_root }}/traefik/auth/dashboard_users"
+    mode: '0640'
+    content: |-
+      {% for u in traefik_dashboard_users %}{{ u }}
+      {% endfor %}
+
+- name: Deploy traefik compose file
+  tags: [traefik]
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ app_data_root }}/traefik/docker-compose.yml"
+    mode: '0644'
+
+- name: Launch traefik
+  tags: [traefik]
+  community.docker.docker_compose_v2:
+    project_src: "{{ app_data_root }}/traefik"
+    state: present
+
+- name: Health check traefik dashboard
+  tags: [traefik]
+  uri:
+    url: "https://{{ services.traefik }}"
+    method: GET
+    return_content: false
+    validate_certs: false
+  register: traefik_health
+  retries: 20
+  delay: 5
+  until: traefik_health.status is defined and traefik_health.status in [200,301,302,401]

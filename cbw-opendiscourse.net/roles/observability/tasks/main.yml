@@ -1,0 +1,54 @@
+---
+- name: Create observability directories
+  tags: [observability]
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ app_data_root }}/observability/prometheus"
+    - "{{ app_data_root }}/observability/grafana"
+    - "{{ app_data_root }}/observability/grafana/provisioning"
+    - "{{ app_data_root }}/observability/grafana/provisioning/datasources"
+    - "{{ app_data_root }}/observability/grafana/dashboards"
+
+- name: Deploy Prometheus configuration
+  tags: [observability]
+  template:
+    src: prometheus.yml.j2
+    dest: "{{ app_data_root }}/observability/prometheus/prometheus.yml"
+    mode: '0644'
+
+- name: Deploy Grafana datasource provisioning
+  tags: [observability]
+  template:
+    src: grafana-datasource.yml.j2
+    dest: "{{ app_data_root }}/observability/grafana/provisioning/datasources/datasource.yml"
+    mode: '0644'
+
+- name: Deploy Loki config
+  tags: [observability]
+  template:
+    src: loki-config.yml.j2
+    dest: "{{ app_data_root }}/observability/loki/config.yml"
+    mode: '0644'
+
+- name: Deploy Promtail config
+  tags: [observability]
+  template:
+    src: promtail-config.yml.j2
+    dest: "{{ app_data_root }}/observability/promtail/config.yml"
+    mode: '0644'
+
+- name: Deploy observability compose file
+  tags: [observability]
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ app_data_root }}/observability/docker-compose.yml"
+    mode: '0644'
+
+- name: Launch observability stack
+  tags: [observability]
+  community.docker.docker_compose_v2:
+    project_src: "{{ app_data_root }}/observability"
+    state: present

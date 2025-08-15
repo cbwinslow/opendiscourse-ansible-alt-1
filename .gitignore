@@ -44,6 +44,9 @@ ansible/inventory/group_vars/all/vault.yml
 ansible/inventory/host_vars/**/vault.yml
 ansible/ansible_vault_password
 ansible/ansible.cfg
+ansible/group_vars/all/vault.generated.yml
+scripts/rotate_secrets.sh.tmp*
+cbw-opendiscourse.net/group_vars/vault.yml
 
 # Docker
 docker/volumes/

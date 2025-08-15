@@ -12,7 +12,7 @@
 
 - name: Install base packages
   apt:
-    name: 
+    name:
       - build-essential
       - python3-pip
       - python3-venv
@@ -29,20 +29,9 @@
       - jq
     state: present
 
-- name: Add Docker GPG key
-  apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    state: present
-
-- name: Add Docker APT repository
-  apt_repository:
-    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
-    state: present
-    update_cache: yes
-
 - name: Configure timezone
   community.general.timezone:
-      name: "{{ timezone }}"
+    name: "{{ timezone }}"
 
 - name: Configure SSH
   template:
@@ -51,17 +40,48 @@
     mode: '0600'
   notify: restart ssh
 
-- name: Configure firewall
+- name: (Legacy) Deploy raw UFW user.rules template (optional)
   template:
     src: ufw_rules.j2
     dest: /etc/ufw/user.rules
   notify: restart ufw
+  when: (manage_raw_ufw_user_rules | default(false)) | bool and (firewall_enabled | default(enable_basic_firewall | default(true))) | bool
+  tags: [ 'firewall' ]
 
-- name: Enable UFW
+- name: Ensure UFW default incoming policy
+  ufw:
+    state: reset
+  when: (firewall_enabled | default(enable_basic_firewall | default(true))) | bool and not (manage_raw_ufw_user_rules | default(false))
+  tags: [ 'firewall' ]
+
+- name: Set UFW default policies
+  ufw:
+    direction: incoming
+    policy: deny
+  when: (firewall_enabled | default(enable_basic_firewall | default(true))) | bool and not (manage_raw_ufw_user_rules | default(false))
+  tags: [ 'firewall' ]
+
+- name: Allow outbound traffic (UFW default is allow)
+  ufw:
+    direction: outgoing
+    policy: allow
+  when: (firewall_enabled | default(enable_basic_firewall | default(true))) | bool and not (manage_raw_ufw_user_rules | default(false))
+  tags: [ 'firewall' ]
+
+- name: Allow required TCP service ports
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop: "{{ firewall_allowed_tcp_ports | default([22,80,443]) }}"
+  when: (firewall_enabled | default(enable_basic_firewall | default(true))) | bool and not (manage_raw_ufw_user_rules | default(false))
+  tags: [ 'firewall' ]
+
+- name: Enable UFW (safe enable after rules)
   ufw:
     state: enabled
-    policy: deny
-    direction: incoming
+  when: (firewall_enabled | default(enable_basic_firewall | default(true))) | bool
+  tags: [ 'firewall' ]
 
 - name: Configure fail2ban
   template:
@@ -88,6 +108,7 @@
     user: "{{ ansible_user }}"
     state: present
     key: "{{ lookup('file', ansible_ssh_private_key_file) }}"
+  when: ansible_ssh_private_key_file is defined
 
 - name: Ensure home directory permissions
   file:
@@ -128,3 +149,6 @@
     owner: root
     group: root
     mode: '0755'
+
+# Docker repository setup (conflict-free)
+## Removed Docker repo setup (delegated to dedicated docker role) to avoid duplication & conflicts

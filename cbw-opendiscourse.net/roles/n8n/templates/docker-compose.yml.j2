@@ -1,0 +1,20 @@
+version: '3.9'
+services:
+  n8n:
+    image: {{ n8n_image }}
+    environment:
+      - GENERIC_TIMEZONE=UTC
+      - N8N_HOST={{ services.n8n }}
+      - WEBHOOK_URL=https://{{ services.n8n }}
+    volumes:
+      - "{{ app_data_root }}/n8n/data:/home/node/.n8n"
+    networks:
+      - {{ shared_network }}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.n8n.rule=Host(`{{ services.n8n }}`)"
+      - "traefik.http.routers.n8n.entrypoints=websecure"
+      - "traefik.http.services.n8n.loadbalancer.server.port=5678"
+networks:
+  {{ shared_network }}:
+    external: true

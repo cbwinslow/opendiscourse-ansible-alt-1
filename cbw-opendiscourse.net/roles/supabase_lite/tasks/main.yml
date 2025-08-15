@@ -1,0 +1,11 @@
+---
+# Placeholder: Light supabase entrypoint (just Kong or placeholder API)
+- name: Create placeholder supabase directory
+  file:
+    path: "{{ app_data_root }}/supabase"
+    state: directory
+    mode: '0755'
+
+- name: Debug notice for supabase future implementation
+  debug:
+    msg: "Supabase full stack not yet implemented here. Will expose Kong at {{ services.supabase_kong }} later."

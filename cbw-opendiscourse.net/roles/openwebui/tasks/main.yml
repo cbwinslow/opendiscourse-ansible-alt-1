@@ -1,0 +1,33 @@
+---
+- name: Create openwebui data dir
+  tags: [openwebui]
+  file:
+    path: "{{ app_data_root }}/openwebui/data"
+    state: directory
+    mode: '0755'
+    recurse: true
+
+- name: Deploy openwebui compose file
+  tags: [openwebui]
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ app_data_root }}/openwebui/docker-compose.yml"
+    mode: '0644'
+
+- name: Launch openwebui
+  tags: [openwebui]
+  community.docker.docker_compose_v2:
+    project_src: "{{ app_data_root }}/openwebui"
+    state: present
+
+- name: Health check openwebui
+  tags: [openwebui]
+  uri:
+    url: "https://{{ services.openwebui }}"
+    method: GET
+    return_content: false
+    validate_certs: false
+  register: openwebui_health
+  retries: 20
+  delay: 5
+  until: openwebui_health.status is defined and openwebui_health.status in [200,301,302,401]

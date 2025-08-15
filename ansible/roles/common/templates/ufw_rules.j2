@@ -1,0 +1,17 @@
+# Managed by Ansible - Basic UFW user rules
+# Allow inbound SSH (22), HTTP (80), HTTPS (443)
+# NOTE: Minimal permissive ruleset for initial bootstrap; harden later.
+*filter
+:ufw-user-input - [0:0]
+:ufw-user-output - [0:0]
+:ufw-user-forward - [0:0]
+
+# Inbound rules
+-A ufw-user-input -p tcp --dport 22 -j ACCEPT
+-A ufw-user-input -p tcp --dport 80 -j ACCEPT
+-A ufw-user-input -p tcp --dport 443 -j ACCEPT
+# Return to main ufw chains
+-A ufw-user-input -j RETURN
+-A ufw-user-output -j RETURN
+-A ufw-user-forward -j RETURN
+COMMIT

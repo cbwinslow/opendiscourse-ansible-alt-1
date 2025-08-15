@@ -1,0 +1,51 @@
+version: '3.9'
+services:
+  traefik:
+    image: {{ traefik_image }}
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--api.dashboard=true"
+      - "--metrics.prometheus=true"
+      - "--metrics.prometheus.addEntryPointsLabels=true"
+      - "--metrics.prometheus.addServicesLabels=true"
+      - "--metrics.prometheus.entryPoint=metrics"
+      - "--entrypoints.metrics.address=:9100"
+      - "--certificatesresolvers.acmehttp.acme.httpchallenge=true"
+      - "--certificatesresolvers.acmehttp.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.acmehttp.acme.email={{ email_acme }}"
+      - "--certificatesresolvers.acmehttp.acme.storage=/letsencrypt/acme.json"
+      - "--log.level=INFO"
+{% if acme_staging %}
+      - "--certificatesresolvers.acmehttp.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+{% endif %}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "9100:9100"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "{{ app_data_root }}/traefik/letsencrypt:/letsencrypt"
+{% if traefik_dashboard_auth_enabled %}
+      - "{{ app_data_root }}/traefik/auth:/auth:ro"
+{% endif %}
+    networks:
+      - {{ shared_network }}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`{{ services.traefik }}`)"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.service=api@internal"
+{% if traefik_dashboard_auth_enabled %}
+      - "traefik.http.middlewares.dashboard-auth.basicauth.usersfile=/auth/dashboard_users"
+      - "traefik.http.routers.dashboard.middlewares=dashboard-auth"
+{% endif %}
+      - "traefik.http.middlewares.redirect-websecure.redirectscheme.scheme=https"
+      - "traefik.http.routers.redirect-web.rule=HostRegexp(`{any:.*}`)"
+      - "traefik.http.routers.redirect-web.entrypoints=web"
+      - "traefik.http.routers.redirect-web.middlewares=redirect-websecure"
+networks:
+  {{ shared_network }}:
+    external: true
