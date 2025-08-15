@@ -2,90 +2,91 @@
   tags: [supabase]
   
 ---
-  - name: Generate fallback Supabase secrets when vault values missing or insecure
-    tags: [supabase]
-    run_once: true
-    set_fact:
-      generated_db_password: "{{ lookup('password','/dev/null', length=32) }}"
-      generated_jwt_secret: "{{ lookup('password','/dev/null', length=48) }}"
-      generated_anon_key: "{{ lookup('password','/dev/null', length=24) }}"
-      generated_service_role_key: "{{ lookup('password','/dev/null', length=48) }}"
 
-  - name: Consolidate Supabase secrets into 'supabase' dict
-    tags: [supabase]
-    set_fact:
-      supabase: >-
-        {{ (supabase | default({})) | combine({
-          'db_password': (supabase.db_password if (supabase.db_password is defined and ('insecure' not in (supabase.db_password | lower))) else generated_db_password),
-          'jwt_secret': (supabase.jwt_secret if (supabase.jwt_secret is defined and ('insecure' not in (supabase.jwt_secret | lower))) else generated_jwt_secret),
-          'anon_key': (supabase.anon_key if (supabase.anon_key is defined and ('insecure' not in (supabase.anon_key | lower))) else generated_anon_key),
-          'service_role_key': (supabase.service_role_key if (supabase.service_role_key is defined and ('insecure' not in (supabase.service_role_key | lower))) else generated_service_role_key)
-        }) }}
+- name: Generate fallback Supabase secrets when vault values missing or insecure
+  tags: [supabase]
+  run_once: true
+  set_fact:
+    generated_db_password: "{{ lookup('password', '/dev/null', length=32) }}"
+    generated_jwt_secret: "{{ lookup('password', '/dev/null', length=48) }}"
+    generated_anon_key: "{{ lookup('password', '/dev/null', length=24) }}"
+    generated_service_role_key: "{{ lookup('password', '/dev/null', length=48) }}"
 
-  - name: Assert required Supabase secrets provided
-    tags: [supabase]
-    assert:
-      that:
-        - "supabase.db_password is defined and (supabase.db_password | length) > 10"
-        - "supabase.jwt_secret is defined and (supabase.jwt_secret | length) >= 16"
-        - "supabase.anon_key is defined and (supabase.anon_key | length) >= 8"
-        - "supabase.service_role_key is defined and (supabase.service_role_key | length) >= 16"
-      fail_msg: "Supabase secrets are missing or too short."
-      success_msg: "Supabase secrets validated."
+- name: Consolidate Supabase secrets into 'supabase' dict
+  tags: [supabase]
+  set_fact:
+    supabase: >-
+      {{ (supabase | default({})) | combine({
+        'db_password': (supabase.db_password if (supabase.db_password is defined and ('insecure' not in (supabase.db_password | lower))) else generated_db_password),
+        'jwt_secret': (supabase.jwt_secret if (supabase.jwt_secret is defined and ('insecure' not in (supabase.jwt_secret | lower))) else generated_jwt_secret),
+        'anon_key': (supabase.anon_key if (supabase.anon_key is defined and ('insecure' not in (supabase.anon_key | lower))) else generated_anon_key),
+        'service_role_key': (supabase.service_role_key if (supabase.service_role_key is defined and ('insecure' not in (supabase.service_role_key | lower))) else generated_service_role_key)
+      }) }}
 
-  - name: Create supabase directories
-    tags: [supabase]
-    file:
-      path: "{{ item }}"
-      state: directory
-      mode: '0755'
-    loop:
-      - "{{ app_data_root }}/supabase"
-      - "{{ app_data_root }}/supabase/db-data"
+- name: Assert required Supabase secrets provided
+  tags: [supabase]
+  assert:
+    that:
+      - "supabase.db_password is defined and (supabase.db_password | length) > 10"
+      - "supabase.jwt_secret is defined and (supabase.jwt_secret | length) >= 16"
+      - "supabase.anon_key is defined and (supabase.anon_key | length) >= 8"
+      - "supabase.service_role_key is defined and (supabase.service_role_key | length) >= 16"
+    fail_msg: "Supabase secrets are missing or too short."
+    success_msg: "Supabase secrets validated."
 
-  - name: Deploy supabase env file
-    tags: [supabase]
-    template:
-      src: supabase.env.j2
-      dest: "{{ app_data_root }}/supabase/.env"
-      mode: '0600'
+- name: Create supabase directories
+  tags: [supabase]
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ app_data_root }}/supabase"
+    - "{{ app_data_root }}/supabase/db-data"
 
-  - name: Deploy supabase compose file
-    tags: [supabase]
-    template:
-      src: docker-compose.yml.j2
-      dest: "{{ app_data_root }}/supabase/docker-compose.yml"
-      mode: '0644'
+- name: Deploy supabase env file
+  tags: [supabase]
+  template:
+    src: supabase.env.j2
+    dest: "{{ app_data_root }}/supabase/.env"
+    mode: '0600'
 
-  - name: Launch supabase stack
-    tags: [supabase]
-    community.docker.docker_compose_v2:
-      project_src: "{{ app_data_root }}/supabase"
-      state: present
+- name: Deploy supabase compose file
+  tags: [supabase]
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ app_data_root }}/supabase/docker-compose.yml"
+    mode: '0644'
 
-  - name: Wait for Supabase endpoints to respond
-    tags: [supabase, health]
-    vars:
-      health_status_codes: "{{ item.status_codes | join(',') }}"
-    uri:
-      url: "{{ item.url }}"
-      method: GET
-      return_content: false
-      status_code: "{{ item.status_codes }}"
-      validate_certs: false
-    register: supabase_health_results
-    retries: 30
-    delay: 5
-    until: supabase_health_results is succeeded
-    loop: "{{ supabase_health_endpoints }}"
-    loop_control:
-      label: "{{ item.name }} -> {{ item.url }}"
+- name: Launch supabase stack
+  tags: [supabase]
+  community.docker.docker_compose_v2:
+    project_src: "{{ app_data_root }}/supabase"
+    state: present
 
-  - name: Summary of Supabase health checks
-    tags: [supabase, health]
-    debug:
-      msg: "Health check {{ item.item.name }} status={{ item.status }} url={{ item.item.url }} code={{ item.status | default('n/a') }}"
-    loop: "{{ supabase_health_results.results }}"
+- name: Wait for Supabase endpoints to respond
+  tags: [supabase, health]
+  vars:
+    health_status_codes: "{{ item.status_codes | join(',') }}"
+  uri:
+    url: "{{ item.url }}"
+    method: GET
+    return_content: false
+    status_code: "{{ item.status_codes }}"
+    validate_certs: false
+  register: supabase_health_results
+  retries: 30
+  delay: 5
+  until: supabase_health_results is succeeded
+  loop: "{{ supabase_health_endpoints }}"
+  loop_control:
+    label: "{{ item.name }} -> {{ item.url }}"
+
+- name: Summary of Supabase health checks
+  tags: [supabase, health]
+  debug:
+    msg: "Health check {{ item.item.name }} status={{ item.status }} url={{ item.item.url }} code={{ item.status | default('n/a') }}"
+  loop: "{{ supabase_health_results.results }}"
 
   - name: Consolidate Supabase secrets into `supabase` dict
     tags: [supabase]
